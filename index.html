@@ -49,6 +49,7 @@
     transition:box-shadow .2s;
   }
   .searchpill:hover{box-shadow:0 5px 16px rgba(0,0,0,.14)}
+  .searchpill .pill-row{display:flex;align-items:center;min-width:0}
   .searchpill .seg{padding:0 16px;font-weight:600}
   .searchpill .seg.gray{color:var(--gray);font-weight:400}
   .searchpill .div{width:1px;height:22px;background:var(--line)}
@@ -58,6 +59,7 @@
     display:flex;align-items:center;justify-content:center;
     font-size:14px;margin-left:8px;flex-shrink:0;
   }
+  .searchpill .go .go-label{display:none}
   .hostlink{display:flex;align-items:center;gap:14px}
   .hostlink .txt{font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px}
   .hostlink .txt:hover{background:var(--chipbg)}
@@ -331,15 +333,23 @@
     .logo .mark{font-size:20px}
     .logo .word{font-size:15px}
     .searchpill{
-      flex:1 1 auto;min-width:0;padding:6px 4px 6px 12px;font-size:12.5px;
+      flex:1 1 auto;min-width:0;padding:8px 10px;font-size:12.5px;
       box-shadow:0 2px 8px rgba(0,0,0,.07);
+      flex-wrap:wrap;row-gap:8px;
+    }
+    .searchpill .pill-row{
+      flex:1 1 100%;display:flex;align-items:center;min-width:0;
     }
     .searchpill .seg{
       padding:0 6px;flex:1 1 0;min-width:0;overflow:hidden;
       text-overflow:ellipsis;white-space:nowrap;text-align:left;
     }
     .searchpill .div{flex-shrink:0}
-    .searchpill .go{width:26px;height:26px;flex-shrink:0;font-size:12px}
+    .searchpill .go{
+      flex:1 1 100%;width:100%;height:38px;border-radius:999px;
+      font-size:13.5px;font-weight:700;gap:6px;margin-left:0;
+    }
+    .searchpill .go .go-label{display:inline}
     .avatar-tap{width:40px;height:40px}
     .avatar{width:30px;height:30px;font-size:12px}
     .home-head{padding:22px 0 4px}
@@ -391,12 +401,14 @@
     <span class="word">saurabh<span>.travels</span></span>
   </div>
   <div class="searchpill">
-    <button class="seg" id="segCity" onclick="openPanel('city',event)">Anywhere in India</button>
-    <span class="div"></span>
-    <button class="seg hidesm" id="segYear" onclick="openPanel('year',event)">Any year</button>
-    <span class="div hidesm"></span>
-    <button class="seg gray" id="segWho" onclick="openPanel('who',event)">With anyone 🐾</button>
-    <button class="go" onclick="goHome()">⌕</button>
+    <div class="pill-row">
+      <button class="seg" id="segCity" onclick="openPanel('city',event)">Anywhere in India</button>
+      <span class="div"></span>
+      <button class="seg hidesm" id="segYear" onclick="openPanel('year',event)">Any year</button>
+      <span class="div hidesm"></span>
+      <button class="seg gray" id="segWho" onclick="openPanel('who',event)">With anyone 🐾</button>
+    </div>
+    <button class="go" onclick="goHome()"><span class="go-icon">⌕</span><span class="go-label">Search</span></button>
   </div>
   <div class="dd" id="searchDD" onclick="event.stopPropagation()"></div>
   <div class="hostlink">
