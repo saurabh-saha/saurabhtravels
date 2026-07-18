@@ -742,6 +742,18 @@
     "Aryan":"🧑 Aryan", "Hrithik":"🤜 Hrithik"
   };
 
+  /* pretty URLs: trip name → slug (e.g. "The Big Loop" → the-big-loop) */
+  function slugify(str){
+    return str.toLowerCase()
+      .replace(/&/g, "and")
+      .normalize("NFKD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+  const SLUG_TO_ID = {};
+  Object.keys(TRIPS).forEach(id=>{ SLUG_TO_ID[slugify(TRIPS[id].name)] = id; });
+  const tripSlug = id => slugify(TRIPS[id].name);
+
   const DURATION = 5000;
   const NS = "http://www.w3.org/2000/svg";
 
@@ -1056,13 +1068,13 @@
     const full = document.createElement("button");
     full.className = "leg-tab" + (curLeg===-1 ? " active" : "");
     full.textContent = "🗺 Full trip";
-    full.onclick = ()=> navigate(`#/trip/${curTrip}`);
+    full.onclick = ()=> navigate(`#/trip/${tripSlug(curTrip)}`);
     tabs.appendChild(full);
     trip.legs.forEach((l,i)=>{
       const b = document.createElement("button");
       b.className = "leg-tab" + (i===curLeg ? " active" : "");
       b.textContent = l.tab;
-      b.onclick = ()=> navigate(`#/trip/${curTrip}/leg/${i+1}`);
+      b.onclick = ()=> navigate(`#/trip/${tripSlug(curTrip)}/leg/${i+1}`);
       tabs.appendChild(b);
     });
   }
@@ -1074,26 +1086,33 @@
   }
 
   /* ---- hash router: every page has its own URL ----
-     #/               → home
-     #/trip/t1        → trip page, full-trip animation
-     #/trip/t1/leg/2  → trip page, leg 2 highlighted
-     #/note           → the Big Loop note                */
+     #/                            → home
+     #/trip/the-big-loop           → trip page, full-trip animation
+     #/trip/the-big-loop/leg/2     → trip page, leg 2 highlighted
+     #/note                        → the Big Loop note
+     (legacy #/trip/t1 links still resolve, then get rewritten) */
   function navigate(hash){
     if(location.hash === hash) route();   /* re-click same link → replay */
     else location.hash = hash;            /* triggers hashchange → route() */
   }
   function goHome(){ navigate("#/"); }
   function openTrip(id, legIdx){
-    navigate(legIdx != null ? `#/trip/${id}/leg/${legIdx+1}` : `#/trip/${id}`);
+    navigate(legIdx != null ? `#/trip/${tripSlug(id)}/leg/${legIdx+1}` : `#/trip/${tripSlug(id)}`);
   }
   function showNote(){ navigate("#/note"); }
 
   function route(){
     cancelAnimationFrame(raf);
     const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+    const tripId = parts[0] === "trip" ? (SLUG_TO_ID[parts[1]] || (TRIPS[parts[1]] ? parts[1] : null)) : null;
 
-    if(parts[0] === "trip" && TRIPS[parts[1]]){
-      curTrip = parts[1];
+    if(tripId){
+      /* legacy id in URL? silently rewrite to the pretty slug */
+      if(!SLUG_TO_ID[parts[1]]){
+        const rest = parts.slice(2).join("/");
+        history.replaceState(null, "", `#/trip/${tripSlug(tripId)}${rest ? "/"+rest : ""}`);
+      }
+      curTrip = tripId;
       const trip = TRIPS[curTrip];
       if(parts[2] === "leg" && parts[3]){
         const n = parseInt(parts[3], 10);
