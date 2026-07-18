@@ -62,10 +62,11 @@
   .hostlink .txt{font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px}
   .hostlink .txt:hover{background:var(--chipbg)}
   .avatar{
-    width:36px;height:36px;border-radius:50%;
+    width:36px;height:36px;border-radius:50%;overflow:hidden;
     background:#222;color:#fff;display:flex;align-items:center;justify-content:center;
     font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s;
   }
+  .avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block}
   .avatar:hover{transform:scale(1.08)}
 
   /* ============ ABOUT ============ */
@@ -80,11 +81,13 @@
     padding:28px;text-align:center;position:sticky;top:96px;background:#fff;
   }
   .host-card .big-avatar{
-    width:96px;height:96px;border-radius:50%;margin:0 auto 10px;
+    width:112px;height:112px;border-radius:50%;margin:0 auto 10px;
     background:var(--rausch-grad);color:#fff;
     display:flex;align-items:center;justify-content:center;
-    font-size:40px;font-weight:800;
+    font-size:40px;font-weight:800;overflow:hidden;
+    border:3px solid #fff;box-shadow:0 0 0 3px var(--line2);
   }
+  .host-card .big-avatar img{width:100%;height:100%;object-fit:cover;display:block}
   .host-card .hname{font-size:22px;font-weight:800}
   .host-card .hsub{color:var(--gray);font-size:13.5px;margin-bottom:18px}
   .host-stats{border-top:1px solid var(--line2);text-align:left;padding-top:6px}
@@ -387,7 +390,7 @@
   <div class="dd" id="searchDD" onclick="event.stopPropagation()"></div>
   <div class="hostlink">
     <button class="avatar-tap" onclick="navigate('#/about')" title="About Saurabh" aria-label="About Saurabh">
-      <span class="avatar">S</span>
+      <span class="avatar"><img src="images/us.jpg" alt="Saurabh"></span>
     </button>
   </div>
 </header>
@@ -511,7 +514,7 @@
     </div>
     <div class="about-wrap">
       <div class="host-card">
-        <div class="big-avatar">S</div>
+        <div class="big-avatar"><img src="images/us.jpg" alt="Saurabh, wife, Cooper & Teddy"></div>
         <div class="hname">Saurabh</div>
         <div class="hsub">Web developer · Bengaluru</div>
         <div class="host-stats">
