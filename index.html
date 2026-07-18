@@ -130,15 +130,24 @@
   .dd.open{display:block}
   .dd-title{font-size:11.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin:4px 10px 10px}
   .dd-opt{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    display:flex;align-items:center;gap:8px;
     width:100%;text-align:left;background:none;border:none;border-radius:12px;
-    padding:11px 12px;font-size:14.5px;font-weight:500;color:var(--ink);
+    padding:10px 12px;font-size:14px;font-weight:500;color:var(--ink);
+    height:40px;box-sizing:border-box;
   }
   .dd-opt:hover{background:var(--chipbg)}
-  .dd-opt .sub{color:var(--gray);font-size:12.5px;font-weight:400}
+  .dd-opt .lbl{
+    flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .dd-opt .cnt{
+    flex:0 0 auto;color:var(--gray);font-size:11px;font-weight:700;
+    background:var(--chipbg);padding:3px 8px;border-radius:999px;
+    white-space:nowrap;
+  }
   .dd-opt.sel{font-weight:700}
-  .dd-opt.sel::after{content:"✓";color:var(--rausch);font-weight:800}
-  .dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .dd-opt.sel .cnt{background:var(--rausch);color:#fff}
+  .dd-opt.sel::after{content:"✓";color:var(--rausch);font-weight:800;flex:0 0 auto}
   .empty-state{
     grid-column:1/-1;text-align:center;color:var(--gray);
     padding:60px 20px;font-size:15px;
@@ -304,7 +313,9 @@
   }
   footer b{color:var(--ink)}
 
-  @media (max-width:900px){
+  /* year segment only hides in the tablet range; on phones it comes back
+     compact (short label) rather than disappearing entirely */
+  @media (max-width:900px) and (min-width:641px){
     .searchpill .seg.hidesm, .searchpill .div.hidesm{display:none}
   }
   /* hostlink avatar: real 44px touch target at every size, circle just sits inside it */
@@ -1046,22 +1057,21 @@
     if(ddOpen === kind){ closePanel(); return; }
     ddOpen = kind;
     let html = "";
-    const opt = (val, label, sub, sel)=>
-      `<button class="dd-opt${sel?" sel":""}" onclick="pick('${kind}','${String(val).replace(/'/g,"\\'")}')">
-         <span>${label}${sub?` <span class="sub">· ${sub}</span>`:""}</span></button>`;
+    const opt = (val, label, count, sel)=>
+      `<button class="dd-opt${sel?" sel":""}" onclick="pick('${kind}','${String(val).replace(/'/g,"\\'")}')" title="${label}">
+         <span class="lbl">${label}</span>${count?`<span class="cnt">${count}</span>`:""}</button>`;
     if(kind==="city"){
-      html = `<div class="dd-title">Where did we drive?</div><div class="dd-grid">`
+      html = `<div class="dd-title">Where did we drive?</div>`
         + opt("all","🇮🇳 Anywhere in India","",fCity==="all")
-        + ALL_CITIES.map(c=> opt(c, c, cityTripCount(c)+(cityTripCount(c)>1?" trips":" trip"), fCity===c)).join("")
-        + `</div>`;
+        + ALL_CITIES.map(c=> opt(c, c, cityTripCount(c), fCity===c)).join("");
     } else if(kind==="year"){
       html = `<div class="dd-title">Which year?</div>`
         + opt("all","🗓 Any year","",fYear==="all")
-        + ALL_YEARS.map(y=> opt(y, y, TRIP_ORDER.filter(id=>TRIP_META[id].years.includes(y)).length+" trips", String(fYear)===String(y))).join("");
+        + ALL_YEARS.map(y=> opt(y, y, TRIP_ORDER.filter(id=>TRIP_META[id].years.includes(y)).length, String(fYear)===String(y))).join("");
     } else {
       html = `<div class="dd-title">Who came along?</div>`
         + opt("all","🧳 Anyone","",fPerson==="all")
-        + ALL_PEOPLE.map(p=> opt(p, PEOPLE_LABELS[p]||p, TRIP_ORDER.filter(id=>TRIP_META[id].people.includes(p)).length+" trips", fPerson===p)).join("");
+        + ALL_PEOPLE.map(p=> opt(p, PEOPLE_LABELS[p]||p, TRIP_ORDER.filter(id=>TRIP_META[id].people.includes(p)).length, fPerson===p)).join("");
     }
     dd.innerHTML = html;
     dd.classList.add("open");
