@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>saurabh.travels — drives, dogs & thinking</title>
+<style>
+  :root{
+    --rausch:#FF385C;
+    --rausch-grad:linear-gradient(90deg,#E61E4D 0%,#E31C5F 50%,#D70466 100%);
+    --ink:#222222;
+    --gray:#717171;
+    --line:#DDDDDD;
+    --line2:#EBEBEB;
+    --bg:#FFFFFF;
+    --chipbg:#F7F7F7;
+    --water:#e9f1f3;
+    --land:#f7f5f0;
+    --landline:#d9d5cc;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Airbnb Cereal VF','Circular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer}
+
+  /* ============ HEADER ============ */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:#fff;border-bottom:1px solid var(--line2);
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;padding:14px 5vw;
+  }
+  .logo{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .logo .mark{font-size:26px;color:var(--rausch)}
+  .logo .word{font-size:20px;font-weight:800;color:var(--rausch);letter-spacing:-.02em}
+  .logo .word span{color:var(--ink);font-weight:600}
+
+  .searchpill{
+    display:flex;align-items:center;
+    border:1px solid var(--line);border-radius:999px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+    padding:8px 8px 8px 22px;gap:0;background:#fff;
+    font-size:14px;white-space:nowrap;cursor:pointer;
+    transition:box-shadow .2s;
+  }
+  .searchpill:hover{box-shadow:0 5px 16px rgba(0,0,0,.14)}
+  .searchpill .seg{padding:0 16px;font-weight:600}
+  .searchpill .seg.gray{color:var(--gray);font-weight:400}
+  .searchpill .div{width:1px;height:22px;background:var(--line)}
+  .searchpill .go{
+    width:34px;height:34px;border-radius:50%;
+    background:var(--rausch);color:#fff;border:none;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;margin-left:8px;flex-shrink:0;
+  }
+  .hostlink{display:flex;align-items:center;gap:14px}
+  .hostlink .txt{font-size:14px;font-weight:600;padding:10px 14px;border-radius:999px}
+  .hostlink .txt:hover{background:var(--chipbg)}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:#222;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;
+  }
+
+  /* ============ HOME ============ */
+  .page{display:none}
+  .page.on{display:block}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 5vw}
+
+  .home-head{padding:34px 0 6px}
+  .home-head h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  .home-head p{color:var(--gray);font-size:15px;margin-top:4px}
+
+  .filters{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:20px 0 0}
+  .fgroup{display:flex;gap:8px;flex-wrap:wrap}
+  .fdiv{width:1px;height:26px;background:var(--line)}
+  .fpill{
+    border:1px solid var(--line);border-radius:999px;background:#fff;
+    padding:8px 16px;font-size:13.5px;font-weight:600;color:var(--gray);
+    transition:all .15s;
+  }
+  .fpill:hover{border-color:var(--ink);color:var(--ink)}
+  .fpill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));
+    gap:28px;padding:26px 0 60px;
+  }
+  .card{cursor:pointer;position:relative}
+  .card .thumb{
+    aspect-ratio:20/19;border-radius:14px;overflow:hidden;
+    background:var(--water);position:relative;
+    transition:transform .25s;
+  }
+  .card:hover .thumb{transform:scale(1.015)}
+  .card .thumb svg{width:100%;height:100%;display:block}
+  .card .heart{
+    position:absolute;top:12px;right:12px;font-size:22px;
+    color:rgba(0,0,0,.45);-webkit-text-stroke:2px #fff;
+    background:none;border:none;line-height:1;
+    transition:transform .15s;
+  }
+  .card .heart:hover{transform:scale(1.15)}
+  .card .heart.saved{color:var(--rausch)}
+  .card .badge{
+    position:absolute;top:12px;left:12px;background:#fff;
+    border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;
+    box-shadow:0 2px 8px rgba(0,0,0,.12);
+  }
+  .card .meta{padding:10px 2px 0;font-size:14.5px;line-height:1.4}
+  .card .row1{display:flex;justify-content:space-between;gap:8px}
+  .card .row1 b{font-weight:700}
+  .card .star{white-space:nowrap;font-weight:500}
+  .card .gray{color:var(--gray)}
+  .card .kms{margin-top:3px}
+  .card .kms b{font-weight:700}
+  .card.ghost .thumb{
+    background:#fff;border:2px dashed var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gray);font-size:15px;text-align:center;padding:20px;
+  }
+
+  /* ============ TRIP PAGE ============ */
+  .back{
+    display:inline-flex;align-items:center;gap:6px;
+    background:none;border:none;font-size:14px;font-weight:600;
+    padding:10px 12px;border-radius:8px;margin:18px 0 0 -12px;
+  }
+  .back:hover{background:var(--chipbg)}
+  .trip-title{padding:8px 0 4px}
+  .trip-title h1{font-size:27px;font-weight:700;letter-spacing:-.01em}
+  .trip-sub{
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    font-size:14.5px;padding:4px 0 18px;color:var(--ink);
+  }
+  .trip-sub .dotsep{color:var(--gray)}
+  .trip-sub .underl{text-decoration:underline;font-weight:600}
+  .trip-sub .gray{color:var(--gray)}
+
+  .leg-tabs{display:flex;gap:10px;flex-wrap:wrap;padding:2px 0 18px}
+  .leg-tab{
+    background:#fff;border:1px solid var(--line);color:var(--ink);
+    padding:9px 18px;border-radius:999px;font-size:13.5px;font-weight:600;
+    transition:all .15s;
+  }
+  .leg-tab:hover{border-color:var(--ink)}
+  .leg-tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  .hero{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start;padding-bottom:8px}
+  .map-wrap{
+    flex:1 1 460px;max-width:660px;
+    background:var(--water);border-radius:18px;overflow:hidden;
+  }
+  .map-wrap svg{width:100%;height:auto;display:block}
+
+  .bookcard{
+    flex:0 1 330px;min-width:290px;
+    border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 6px 20px rgba(0,0,0,.1);
+    padding:24px;position:sticky;top:96px;background:#fff;
+  }
+  .bookcard .leg-title{font-size:19px;font-weight:700}
+  .bookcard .leg-title span{color:var(--rausch)}
+  .bookcard .sub{color:var(--gray);font-size:13.5px;margin:4px 0 16px}
+  .metric{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
+  .metric .big{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+  .metric .unit{color:var(--gray);font-size:14px}
+  .metric.small .big{font-size:20px}
+  .divline{height:1px;background:var(--line2);margin:14px 0}
+  .chips-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:8px}
+  .cities-passed{display:flex;flex-wrap:wrap;gap:6px;min-height:52px}
+  .chip{
+    font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:999px;
+    background:var(--chipbg);color:var(--gray);
+    opacity:.5;transform:scale(.94);
+    transition:all .45s cubic-bezier(.2,.9,.3,1.4);
+  }
+  .chip.lit{
+    opacity:1;transform:scale(1);
+    background:var(--ink);color:#fff;
+  }
+  button.replay{
+    width:100%;margin-top:16px;
+    background:var(--rausch-grad);color:#fff;border:none;
+    padding:14px;border-radius:10px;font-size:15.5px;font-weight:700;
+    transition:transform .1s;
+  }
+  button.replay:active{transform:scale(.98)}
+  .bookcard .fine{color:var(--gray);font-size:12.5px;text-align:center;margin-top:10px}
+
+  /* amenities / facts */
+  .facts-sec{padding:26px 0 8px;border-top:1px solid var(--line2);margin-top:26px}
+  .facts-sec h2{font-size:20px;font-weight:700;margin-bottom:18px}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 24px;padding-bottom:26px}
+  .fact{display:flex;gap:14px;align-items:flex-start}
+  .fact .ico{font-size:24px;line-height:1.2}
+  .fact .k{font-weight:600;font-size:15px}
+  .fact .s{color:var(--gray);font-size:13.5px;margin-top:2px}
+
+  .notelink{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--ink);border-radius:10px;background:#fff;
+    padding:12px 20px;font-size:14.5px;font-weight:600;margin:4px 0 40px;
+  }
+  .notelink:hover{background:var(--chipbg)}
+
+  /* map svg (light theme) */
+  .india-outline{fill:var(--land);stroke:var(--landline);stroke-width:1.5}
+  .route-base{fill:none;stroke:#d8d5cd;stroke-width:5;stroke-linecap:round}
+  .route-glow{fill:none;stroke:var(--rausch);stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 1px 3px rgba(255,56,92,.45))}
+  .city-dot{fill:#fff;stroke:#9a9a9a;stroke-width:1.5;transition:all .4s}
+  .city-dot.lit{fill:var(--rausch);stroke:#fff;filter:drop-shadow(0 1px 4px rgba(255,56,92,.7))}
+  .city-label{font-size:13px;font-weight:700;fill:#8a8a8a;opacity:.75;transition:all .4s}
+  .city-label.lit{fill:var(--ink);opacity:1}
+  .pulse{fill:none;stroke:var(--rausch);stroke-width:2;opacity:0}
+  .car{filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  .sea-label{font-size:12px;fill:#a8c3cc;font-style:italic;letter-spacing:.2em}
+
+  /* thumbnails reuse outline colors via classes above */
+  .thumb .route-mini{fill:none;stroke:var(--rausch);stroke-linecap:round}
+
+  /* ============ NOTE ============ */
+  .post{
+    max-width:680px;margin:0 auto;padding:30px 24px 100px;
+    font-size:16.5px;line-height:1.8;color:#3d3d3d;
+  }
+  .post .kicker{color:var(--rausch);text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:800}
+  .post h2{font-size:clamp(1.5rem,3vw,2.1rem);color:var(--ink);margin:10px 0 8px;letter-spacing:-.02em;line-height:1.25;font-weight:800}
+  .post .byline{color:var(--gray);font-size:14px;margin-bottom:34px}
+  .post p{margin-bottom:22px}
+  .post h3{color:var(--ink);font-size:19px;margin:38px 0 14px;font-weight:800}
+  .post .pull{
+    border-left:3px solid var(--rausch);padding:6px 0 6px 22px;margin:32px 0;
+    font-size:19px;color:var(--ink);font-style:italic;line-height:1.6;
+  }
+  .post .sig{margin-top:42px;color:var(--gray);font-style:italic}
+
+  footer{
+    border-top:1px solid var(--line2);padding:22px 5vw;color:var(--gray);
+    font-size:13.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+  footer b{color:var(--ink)}
+
+  @media (max-width:900px){
+    .searchpill .seg.hidesm{display:none}
+  }
+  @media (max-width:640px){
+    .searchpill{display:none}
+    .bookcard{position:static}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="logo" onclick="goHome()">
+    <span class="mark">🧭</span>
+    <span class="word">saurabh<span>.travels</span></span>
+  </div>
+  <div class="searchpill" onclick="goHome()">
+    <span class="seg">Anywhere in India</span>
+    <span class="div"></span>
+    <span class="seg hidesm">Jul '24 – Jan '26</span>
+    <span class="div hidesm"></span>
+    <span class="seg gray">With Cooper 🐾</span>
+    <button class="go">⌕</button>
+  </div>
+  <div class="hostlink">
+    <span class="txt">i20 automatic · co-driver: wife</span>
+    <div class="avatar">S</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== HOME ===== -->
+  <section class="page on" id="page-home">
+    <div class="wrap">
+      <div class="home-head">
+        <h1>Past drives</h1>
+        <p>Seven trips and counting — a wife, a dog, parents, a friend, a brother, one hatchback.</p>
+      </div>
+      <div class="filters">
+        <div class="fgroup" id="yearFilters"></div>
+        <div class="fdiv"></div>
+        <div class="fgroup" id="peopleFilters"></div>
+      </div>
+      <div class="grid" id="cardGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== TRIP ===== -->
+  <section class="page" id="page-trip">
+    <div class="wrap">
+      <button class="back" onclick="goHome()">← All trips</button>
+      <div class="trip-title"><h1 id="tripTitle"></h1></div>
+      <div class="trip-sub" id="tripSub"></div>
+
+      <div class="leg-tabs" id="legTabs"></div>
+
+      <div class="hero">
+        <div class="map-wrap">
+          <svg id="mainMap" viewBox="0 0 620 720" xmlns="http://www.w3.org/2000/svg" aria-label="Animated route map">
+            <path class="india-outline" d="
+              M232,28
+              C210,50 196,74 178,96 C158,120 132,138 118,166
+              C104,194 100,224 88,252 C78,276 62,296 66,322
+              C70,346 96,352 112,370 C134,396 148,430 164,462
+              C182,498 200,534 222,568 C240,596 256,628 278,650
+              C290,662 304,672 312,658 C322,640 316,614 322,594
+              C332,560 352,532 366,500 C382,464 396,428 408,392
+              C418,362 430,334 442,306 C452,282 466,260 470,234
+              C474,214 466,196 476,178 C488,158 512,150 530,138
+              C548,126 566,116 560,100 C554,84 530,88 512,84
+              C490,80 470,68 448,64 C420,58 392,60 364,54
+              C334,48 306,36 276,30 C262,27 246,26 232,28 Z"/>
+            <text class="sea-label" x="440" y="640">BAY  OF  BENGAL</text>
+            <text class="sea-label" x="142" y="600">ARABIAN  SEA</text>
+            <g id="routeLayer"></g>
+            <g id="cityLayer"></g>
+            <g id="car" class="car">
+              <g transform="translate(-16,-9)">
+                <rect x="2" y="4" width="28" height="10" rx="5" fill="#FF385C"/>
+                <path d="M8,4 L12,-1 L22,-1 L26,4 Z" fill="#E31C5F"/>
+                <rect x="13" y="0.5" width="7" height="3.5" rx="1" fill="#fff"/>
+                <circle cx="9" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
+                <circle cx="24" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
+                <circle cx="29" cy="7" r="1.6" fill="#fff8c4"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <div class="bookcard">
+          <div class="leg-title" id="legTitle"></div>
+          <p class="sub" id="legSub"></p>
+          <div class="metric"><span class="big" id="km">0</span><span class="unit">km covered</span></div>
+          <div class="metric small"><span class="big" id="hrs">0</span><span class="unit">hrs on the road</span></div>
+          <div class="divline"></div>
+          <div class="chips-label">Cities along the way</div>
+          <div class="cities-passed" id="chips"></div>
+          <button class="replay" id="replayBtn" onclick="run()">Replay the whole trip</button>
+          <div class="fine">You won't be charged. Cooper rides free.</div>
+        </div>
+      </div>
+
+      <div class="facts-sec">
+        <h2>What this trip offers</h2>
+        <div class="facts" id="facts"></div>
+        <button class="notelink" id="noteLink" onclick="showNote()" style="display:none">📝 Read the note I wrote after this trip</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NOTE ===== -->
+  <section class="page" id="page-note">
+    <div class="wrap">
+      <button class="back" onclick="openTrip('t1')">← Back to The Big Loop</button>
+    </div>
+    <article class="post">
+      <div class="kicker">Trip 1 · A note to myself</div>
+      <h2>Why the break before the beginning mattered</h2>
+      <div class="byline">Bengaluru ↔ Siliguri · ~4,900 km round trip · written 17 months later</div>
+
+      <p>Last February, in the gap before my first day of work, the three of us — me, my wife, and Cooper with his head permanently out the rear window — pointed the i20 north and drove the entire eastern edge of India. Up the coast past Chennai, Vijayawada, Visakhapatnam, Bhubaneswar, through Kolkata, and on to Siliguri under the shadow of the Himalayas. Then, when it was time, the same road home in reverse.</p>
+
+      <p>People asked why we didn't just fly. It's two and a half hours. The honest answer: I didn't want to teleport between two lives. I wanted the transition to take as long as it actually felt. (Also, nobody consulted Cooper, and Cooper does not fly.)</p>
+
+      <div class="pull">A break isn't the absence of progress. It's the part where progress gets absorbed.</div>
+
+      <h3>What the road taught me about breaks</h3>
+      <p>Ninety-odd hours of driving, split between two legs, gives your mind nowhere to hide. Somewhere along the Odisha coast the mental noise — packing, goodbyes, the offer letter, what-ifs — finally went quiet, and underneath it was space. Space to feel proud of what was ending instead of only anxious about what was next. Breaks do that. They convert experience into understanding. You don't process a whole chapter of your life while forwarding your mail. You process it at 80 km/h with the sea on your left, your wife picking the music, and a golden retriever snoring on the back seat.</p>
+
+      <p>And doing the same road twice turned out to be the point, not the flaw. On the way up it was anticipation; on the way back, the same towns and the same toll booths felt completely different, because we were different. Same route, new people driving it.</p>
+
+      <h3>What I want to do next</h3>
+      <p>It's been about a year and a half since that loop, and a full year of work is behind me. A lot happened — the kind of a lot that accumulates quietly while you're busy being reliable. Wins I didn't stop to celebrate, mistakes I didn't stop to forgive.</p>
+
+      <p>So the next trip isn't about distance. It's about finding a safe place to think — somewhere slow and quiet where I can lay out the last year the way I once laid out that route, and actually look at it. The hills, probably; the mountains we drove <em>toward</em> that February feel like the right place to return to. A week, a notebook, no itinerary. Cooper is already on board. He's always on board.</p>
+
+      <p>Because if the Big Loop taught me one thing, it's this: the pause isn't a detour from the journey. Sometimes it's the most important stretch of road on the whole map.</p>
+
+      <p class="sig">— Saurabh</p>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <div>© 2026 <b>saurabh.travels</b> · roads, dogs & thinking</div>
+  <div>Core crew: Saurabh · wife · Cooper 🐕 · Guest stars: Mom & Dad, Aryan, Hrithik · Machine: i20 automatic</div>
+</footer>
+
+<script>
+  /* ================= ROUTE DATA ================= */
+  const INDIA_D = "M232,28 C210,50 196,74 178,96 C158,120 132,138 118,166 C104,194 100,224 88,252 C78,276 62,296 66,322 C70,346 96,352 112,370 C134,396 148,430 164,462 C182,498 200,534 222,568 C240,596 256,628 278,650 C290,662 304,672 312,658 C322,640 316,614 322,594 C332,560 352,532 366,500 C382,464 396,428 408,392 C418,362 430,334 442,306 C452,282 466,260 470,234 C474,214 466,196 476,178 C488,158 512,150 530,138 C548,126 566,116 560,100 C554,84 530,88 512,84 C490,80 470,68 448,64 C420,58 392,60 364,54 C334,48 306,36 276,30 C262,27 246,26 232,28 Z";
+
+  const EAST_PATH = "M462,205 C456,240 450,268 446,300 C438,326 430,342 418,364 C406,390 398,408 388,428 C374,450 358,464 346,484 C336,510 324,534 316,556 C300,572 276,566 254,570";
+  const EAST_CITIES = [
+    { name:"Siliguri",       x:462, y:205, anchor:"start", dx:12,  dy:-6  },
+    { name:"Kolkata",        x:446, y:300, anchor:"start", dx:12,  dy:4   },
+    { name:"Bhubaneswar",    x:418, y:364, anchor:"end",   dx:-12, dy:4   },
+    { name:"Visakhapatnam",  x:388, y:428, anchor:"end",   dx:-12, dy:4   },
+    { name:"Vijayawada",     x:346, y:484, anchor:"end",   dx:-12, dy:4   },
+    { name:"Chennai",        x:316, y:556, anchor:"start", dx:12,  dy:12  },
+    { name:"Bengaluru",      x:254, y:570, anchor:"end",   dx:-12, dy:-8  }
+  ];
+
+  const NH44_PATH = "M254,570 C270,530 280,495 290,455 C298,428 300,398 300,370 C298,336 292,306 285,275 C280,244 272,214 268,185 C266,168 267,153 268,138";
+  const NH44_CITIES = [
+    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 },
+    { name:"Hyderabad",  x:290, y:455, anchor:"start", dx:12,  dy:4  },
+    { name:"Nagpur",     x:300, y:370, anchor:"start", dx:12,  dy:4  },
+    { name:"Jhansi",     x:285, y:275, anchor:"start", dx:12,  dy:4  },
+    { name:"Delhi",      x:268, y:185, anchor:"start", dx:12,  dy:4  },
+    { name:"Chandigarh", x:268, y:138, anchor:"start", dx:12,  dy:-4 }
+  ];
+
+  const RETURN_PATH = "M268,138 C280,140 292,146 300,152 C296,166 282,178 268,190 C255,205 240,222 230,238 C226,255 226,271 228,288 C232,310 236,330 240,352 C230,390 212,428 200,465 C206,502 232,540 254,570";
+  const RETURN_CITIES = [
+    { name:"Chandigarh", x:268, y:138, anchor:"start", dx:12,  dy:-4 },
+    { name:"Rishikesh",  x:300, y:152, anchor:"start", dx:10,  dy:12 },
+    { name:"Jaipur",     x:230, y:238, anchor:"end",   dx:-12, dy:4  },
+    { name:"Kota",       x:228, y:288, anchor:"end",   dx:-12, dy:4  },
+    { name:"Indore",     x:240, y:352, anchor:"end",   dx:-12, dy:4  },
+    { name:"Pune",       x:200, y:465, anchor:"end",   dx:-12, dy:4  },
+    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 }
+  ];
+
+  const GOA_DOWN_PATH = "M254,570 C240,555 228,540 215,525 C202,518 188,512 178,505 C174,499 172,493 172,488 C171,484 170,480 170,477";
+  const GOA_DOWN_CITIES = [
+    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 },
+    { name:"Shivamogga", x:215, y:525, anchor:"start", dx:10,  dy:10 },
+    { name:"Honnavar",   x:178, y:505, anchor:"start", dx:10,  dy:8  },
+    { name:"Karwar",     x:172, y:488, anchor:"start", dx:10,  dy:4  },
+    { name:"Agonda",     x:170, y:477, anchor:"start", dx:10,  dy:-4 }
+  ];
+  const GOA_HOP_PATH = "M170,477 C169,474 168,472 168,470 C167,467 166,465 165,462 C164,460 163,457 163,455";
+  const GOA_HOP_CITIES = [
+    { name:"Agonda",  x:170, y:477, anchor:"start", dx:8, dy:4  },
+    { name:"Madgaon", x:168, y:470, anchor:"start", dx:8, dy:2  },
+    { name:"Panaji",  x:165, y:462, anchor:"start", dx:8, dy:2  },
+    { name:"Vagator", x:163, y:455, anchor:"start", dx:8, dy:-2 }
+  ];
+  const GOA_UP_PATH = "M163,455 C172,447 186,440 198,437 C204,443 208,449 212,455 C220,475 226,495 232,522 C238,538 246,555 254,570";
+  const GOA_UP_CITIES = [
+    { name:"Vagator",     x:163, y:455, anchor:"start", dx:8,   dy:-6 },
+    { name:"Belagavi",    x:198, y:437, anchor:"start", dx:8,   dy:-4 },
+    { name:"Dharwad",     x:212, y:455, anchor:"start", dx:10,  dy:4  },
+    { name:"Chitradurga", x:232, y:522, anchor:"start", dx:10,  dy:4  },
+    { name:"Bengaluru",   x:254, y:570, anchor:"end",   dx:-12, dy:-8 }
+  ];
+
+  /* Bengaluru → Chikkamagaluru via Hassan & Belur */
+  const CHIK_PATH = "M254,570 C245,566 236,562 228,558 C224,555 219,552 215,550 C213,548 210,545 208,543";
+  const CHIK_CITIES = [
+    { name:"Bengaluru",      x:254, y:570, anchor:"start", dx:6,  dy:12  },
+    { name:"Hassan",         x:228, y:558, anchor:"start", dx:3,  dy:13  },
+    { name:"Belur",          x:215, y:550, anchor:"start", dx:2,  dy:-9  },
+    { name:"Chikkamagaluru", x:208, y:543, anchor:"end",   dx:-8, dy:-4  }
+  ];
+
+  /* Bengaluru → Hyderabad on NH 44 (first stretch of the great spine) */
+  const HYD_PATH = "M254,570 C270,530 280,495 290,455";
+  const HYD_CITIES = [
+    { name:"Bengaluru", x:254, y:570, anchor:"end",   dx:-10, dy:-6 },
+    { name:"Anantapur", x:274, y:512, anchor:"start", dx:8,   dy:4  },
+    { name:"Kurnool",   x:282, y:484, anchor:"start", dx:8,   dy:4  },
+    { name:"Hyderabad", x:290, y:455, anchor:"start", dx:8,   dy:-4 }
+  ];
+
+  /* Bengaluru → Varkala down through Kerala (NH 544 / NH 66) */
+  const VARKALA_PATH = "M254,570 C260,577 266,583 270,590 C264,595 255,600 250,606 C252,615 255,624 258,632 C263,637 269,642 274,646 C276,648 278,650 280,652";
+  const VARKALA_CITIES = [
+    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-10, dy:-6 },
+    { name:"Salem",      x:270, y:590, anchor:"start", dx:8,   dy:4  },
+    { name:"Coimbatore", x:250, y:606, anchor:"end",   dx:-8,  dy:4  },
+    { name:"Kochi",      x:258, y:632, anchor:"end",   dx:-8,  dy:4  },
+    { name:"Varkala",    x:280, y:652, anchor:"start", dx:8,   dy:6  }
+  ];
+
+  /* Bengaluru → Pondicherry via Krishnagiri & Tiruvannamalai */
+  const PONDY_PATH = "M254,570 C260,574 266,577 272,580 C280,583 288,584 295,586 C304,588 314,590 322,592";
+  const PONDY_CITIES = [
+    { name:"Bengaluru",     x:254, y:570, anchor:"end",   dx:-10, dy:-8 },
+    { name:"Krishnagiri",   x:272, y:580, anchor:"start", dx:4,   dy:14 },
+    { name:"Tiruvannamalai",x:295, y:586, anchor:"start", dx:2,   dy:-10},
+    { name:"Pondicherry",   x:322, y:592, anchor:"start", dx:8,   dy:6  }
+  ];
+
+  const FULL_VIEW  = { x:0, y:0, w:620, h:720 };
+  const GOA_VIEW   = { x:135, y:425, w:170, h:198 };
+  const HOP_VIEW   = { x:138, y:436, w:60,  h:70  };
+  const PONDY_VIEW = { x:228, y:522, w:120, h:140 };
+  const CHIK_VIEW  = { x:190, y:518, w:82,  h:95  };
+  const HYD_VIEW   = { x:222, y:438, w:125, h:145 };
+  const VARKALA_VIEW = { x:225, y:550, w:105, h:122 };
+
+  /* ================= TRIPS ================= */
+  const TRIPS = {
+    t1: {
+      name: "The Big Loop",
+      where: "Bengaluru ↔ Siliguri",
+      when: "Feb 2025",
+      totalLabel: "4,912 km round trip",
+      badge: "Guest favourite",
+      rating: "★ 5.0",
+      subline: ['★ 5.0', '·', 'Cooper approved', '·', '3 travellers', '·', 'Feb 2025 — the break before work began'],
+      thumbView: FULL_VIEW,
+      thumbPaths: [EAST_PATH],
+      hasNote: true,
+      view: FULL_VIEW,
+      fullTitle: 'Full trip <span>→ there & back</span>',
+      fullSub: "Bengaluru → Siliguri → Bengaluru · NH 16 both ways",
+      facts: [
+        { i:"🗓", k:"February 2025", s:"the gap between university and the first day of work" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"one loyal hatchback, zero complaints" },
+        { i:"🐕", k:"Saurabh · Wife · Cooper", s:"golden retriever, chief window inspector" },
+        { i:"🛣", k:"NH 16, east coast", s:"~2,456 km each way · same road both ways" }
+      ],
+      legs: [
+        { tab:"↑ Onward — Bengaluru → Siliguri",
+          title:'Onward <span>→ the mountains</span>',
+          sub:"Bengaluru → Siliguri · NH 16 up the coast",
+          path:EAST_PATH, cities:EAST_CITIES, reverse:true,  km:2456, hrs:44 },
+        { tab:"↓ Return — Siliguri → Bengaluru",
+          title:'Return <span>→ home</span>',
+          sub:"Siliguri → Bengaluru · same road, different people",
+          path:EAST_PATH, cities:EAST_CITIES, reverse:false, km:2456, hrs:44 }
+      ]
+    },
+    t2: {
+      name: "The North Star",
+      where: "Bengaluru ↔ Chandigarh",
+      when: "Dec '24 – Jan '25",
+      totalLabel: "~5,100 km round trip",
+      badge: "New year on the road",
+      rating: "★ 4.9",
+      subline: ['★ 4.9', '·', "Cooper's first Himalayan winter", '·', '3 travellers', '·', "Dec '24 – Jan '25"],
+      thumbView: FULL_VIEW,
+      thumbPaths: [NH44_PATH, RETURN_PATH],
+      hasNote: false,
+      view: FULL_VIEW,
+      fullTitle: 'Full trip <span>→ the winter loop</span>',
+      fullSub: "Up NH 44 via Nagpur · home via Rishikesh, Jaipur & Kota",
+      facts: [
+        { i:"🗓", k:"Dec 2024 – Jan 2025", s:"the winter escape, new year on the road" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"same loyal hatchback" },
+        { i:"🐕", k:"Saurabh · Wife · Cooper", s:"Cooper's first Himalayan winter" },
+        { i:"🛣", k:"Up NH 44 · back the scenic way", s:"via Nagpur up · Rishikesh, Jaipur & Kota home" }
+      ],
+      legs: [
+        { tab:"↑ Onward — via Nagpur",
+          title:'Onward <span>→ straight up the spine</span>',
+          sub:"Bengaluru → Chandigarh · NH 44 via Nagpur & Delhi",
+          path:NH44_PATH, cities:NH44_CITIES, reverse:false, km:2412, hrs:42 },
+        { tab:"↓ Return — Rishikesh · Jaipur · Kota",
+          title:'Return <span>→ the long way home</span>',
+          sub:"Chandigarh → Rishikesh → Jaipur → Kota → Bengaluru",
+          path:RETURN_PATH, cities:RETURN_CITIES, reverse:false, km:2700, hrs:48 }
+      ]
+    },
+    t3: {
+      name: "Monsoon Goa",
+      where: "Bengaluru ↔ Goa",
+      when: "Aug 2024",
+      totalLabel: "~1,320 km triangle",
+      badge: "Cooper's first ocean",
+      rating: "★ 5.0",
+      subline: ['★ 5.0', '·', "Cooper's first ocean", '·', '3 travellers', '·', 'Aug 2024 — monsoon coast, empty beaches'],
+      thumbView: GOA_VIEW,
+      thumbPaths: [GOA_DOWN_PATH, GOA_HOP_PATH, GOA_UP_PATH],
+      hasNote: false,
+      view: GOA_VIEW,
+      fullTitle: 'Full trip <span>→ the Goa triangle</span>',
+      fullSub: "Down the coast · beach-hop Agonda → Vagator · NH 48 home",
+      facts: [
+        { i:"🗓", k:"August 2024", s:"monsoon coast, empty beaches" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"same loyal hatchback" },
+        { i:"🐕", k:"Saurabh · Wife · Cooper", s:"Cooper's first ocean" },
+        { i:"🛣", k:"A Goa triangle", s:"down past Murdeshwara · beach-hop Agonda→Vagator · NH 48 home" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Agonda",
+          title:'Going <span>→ the quiet beach</span>',
+          sub:"Bengaluru → Agonda · NH 48 & NH 69, coast past Murdeshwara",
+          path:GOA_DOWN_PATH, cities:GOA_DOWN_CITIES, reverse:false, km:610, hrs:12, view:GOA_VIEW },
+        { tab:"☀ In Goa — Agonda → Vagator",
+          title:'Beach hop <span>→ south to north</span>',
+          sub:"Agonda → Madgaon → Panaji → Vagator · the whole coast in a morning",
+          path:GOA_HOP_PATH, cities:GOA_HOP_CITIES, reverse:false, km:80, hrs:2.5, view:HOP_VIEW },
+        { tab:"↓ Down — Vagator → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Vagator → Belagavi → Chitradurga → Bengaluru · NH 48",
+          path:GOA_UP_PATH, cities:GOA_UP_CITIES, reverse:false, km:632, hrs:11.5, view:GOA_VIEW }
+      ]
+    },
+    t4: {
+      name: "The Pondy Run",
+      where: "Bengaluru ↔ Pondicherry",
+      when: "Aug 2025",
+      totalLabel: "~640 km round trip",
+      badge: "Boys' trip",
+      rating: "★ 4.8",
+      subline: ['★ 4.8', '·', 'French toast & sea breeze', '·', '2 travellers', '·', 'Aug 2025 — the weekend dash'],
+      thumbView: PONDY_VIEW,
+      thumbPaths: [PONDY_PATH],
+      hasNote: false,
+      view: PONDY_VIEW,
+      fullTitle: 'Full trip <span>→ the weekend dash</span>',
+      fullSub: "Bengaluru → Pondicherry → Bengaluru · via Tiruvannamalai",
+      facts: [
+        { i:"🗓", k:"August 2025", s:"a long weekend, booked on a Thursday" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"same loyal hatchback" },
+        { i:"🧑‍🤝‍🧑", k:"Saurabh · Aryan Rai", s:"the boys' trip — Cooper sat this one out" },
+        { i:"🛣", k:"Via Tiruvannamalai & Gingee", s:"~320 km each way · temples, forts, then the French quarter" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Pondy",
+          title:'Going <span>→ the French quarter</span>',
+          sub:"Bengaluru → Krishnagiri → Tiruvannamalai → Pondicherry",
+          path:PONDY_PATH, cities:PONDY_CITIES, reverse:false, km:320, hrs:6, view:PONDY_VIEW },
+        { tab:"↓ Back — Pondy → BLR",
+          title:'Return <span>→ back to Monday</span>',
+          sub:"Pondicherry → Bengaluru · same road, sandier car",
+          path:PONDY_PATH, cities:PONDY_CITIES, reverse:true, km:320, hrs:6, view:PONDY_VIEW }
+      ]
+    },
+    t5: {
+      name: "Coffee Country",
+      where: "Bengaluru ↔ Chikkamagaluru",
+      when: "Jul 2024",
+      totalLabel: "~490 km round trip",
+      badge: "Full house",
+      rating: "★ 5.0",
+      subline: ['★ 5.0', '·', 'Four humans, one golden retriever', '·', '5 travellers', '·', 'Jul 2024 — where it all started'],
+      thumbView: CHIK_VIEW,
+      thumbPaths: [CHIK_PATH],
+      hasNote: false,
+      view: CHIK_VIEW,
+      fullTitle: 'Full trip <span>→ into the coffee hills</span>',
+      fullSub: "Bengaluru → Chikkamagaluru → Bengaluru · via Hassan & Belur",
+      facts: [
+        { i:"🗓", k:"July 2024", s:"monsoon mist on the coffee estates — the trip that started it all" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"four adults + one golden retriever = one brave hatchback" },
+        { i:"👨‍👩‍👦", k:"Saurabh · Wife · Mom & Dad · Cooper", s:"the full house — Cooper shared the back seat with grandparents" },
+        { i:"🛣", k:"Via Hassan & Belur", s:"~245 km each way · Hoysala temples on the way up" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Chikkamagaluru",
+          title:'Going <span>→ the coffee hills</span>',
+          sub:"Bengaluru → Hassan → Belur → Chikkamagaluru",
+          path:CHIK_PATH, cities:CHIK_CITIES, reverse:false, km:245, hrs:5, view:CHIK_VIEW },
+        { tab:"↓ Back — Chikkamagaluru → BLR",
+          title:'Return <span>→ down from the mist</span>',
+          sub:"Chikkamagaluru → Bengaluru · car smelling of filter coffee",
+          path:CHIK_PATH, cities:CHIK_CITIES, reverse:true, km:245, hrs:5, view:CHIK_VIEW }
+      ]
+    },
+    t6: {
+      name: "The Biryani Express",
+      where: "Bengaluru ↔ Hyderabad",
+      when: "Oct 2025",
+      totalLabel: "~1,140 km round trip",
+      badge: "Brothers' drive",
+      rating: "★ 4.9",
+      subline: ['★ 4.9', '·', 'Two brothers, one playlist', '·', '2 travellers', '·', 'Oct 2025 — festive season dash'],
+      thumbView: HYD_VIEW,
+      thumbPaths: [HYD_PATH],
+      hasNote: false,
+      view: HYD_VIEW,
+      fullTitle: 'Full trip <span>→ biryani & back</span>',
+      fullSub: "Bengaluru → Hyderabad → Bengaluru · NH 44 all the way",
+      facts: [
+        { i:"🗓", k:"October 2025", s:"festive season, brother time" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"same loyal hatchback" },
+        { i:"🤜🤛", k:"Saurabh · Hrithik", s:"brothers' drive — argued about music for 570 km" },
+        { i:"🛣", k:"NH 44 via Anantapur & Kurnool", s:"~570 km each way · the first stretch of the great spine" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Hyderabad",
+          title:'Going <span>→ the biryani</span>',
+          sub:"Bengaluru → Anantapur → Kurnool → Hyderabad · NH 44",
+          path:HYD_PATH, cities:HYD_CITIES, reverse:false, km:570, hrs:9, view:HYD_VIEW },
+        { tab:"↓ Back — Hyderabad → BLR",
+          title:'Return <span>→ home, well fed</span>',
+          sub:"Hyderabad → Bengaluru · same road, heavier hearts & stomachs",
+          path:HYD_PATH, cities:HYD_CITIES, reverse:true, km:570, hrs:9, view:HYD_VIEW }
+      ]
+    },
+    t7: {
+      name: "Cliffs & Coconuts",
+      where: "Bengaluru ↔ Varkala",
+      when: "Jan 2026",
+      totalLabel: "~1,510 km round trip",
+      badge: "Cliff-top winter",
+      rating: "★ 5.0",
+      subline: ['★ 5.0', '·', 'Cooper vs. the Arabian Sea, round 2', '·', '3 travellers', '·', 'Jan 2026 — new year on the cliff'],
+      thumbView: VARKALA_VIEW,
+      thumbPaths: [VARKALA_PATH],
+      hasNote: false,
+      view: VARKALA_VIEW,
+      fullTitle: 'Full trip <span>→ down the whole coast</span>',
+      fullSub: "Bengaluru → Kochi → Varkala → Bengaluru · NH 544 & NH 66",
+      facts: [
+        { i:"🗓", k:"January 2026", s:"starting the year at the cliff edge" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"same loyal hatchback" },
+        { i:"🐕", k:"Saurabh · Wife · Cooper", s:"back to the classic crew" },
+        { i:"🛣", k:"NH 544 & NH 66 through Kerala", s:"~755 km each way · Salem, Coimbatore, Kochi, then the cliffs" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Varkala",
+          title:'Going <span>→ the red cliffs</span>',
+          sub:"Bengaluru → Salem → Coimbatore → Kochi → Varkala",
+          path:VARKALA_PATH, cities:VARKALA_CITIES, reverse:false, km:755, hrs:14, view:VARKALA_VIEW },
+        { tab:"↓ Back — Varkala → BLR",
+          title:'Return <span>→ up from the coast</span>',
+          sub:"Varkala → Bengaluru · sand in every seat crevice",
+          path:VARKALA_PATH, cities:VARKALA_CITIES, reverse:true, km:755, hrs:14, view:VARKALA_VIEW }
+      ]
+    }
+  };
+  const TRIP_ORDER = ["t1","t2","t3","t4","t5","t6","t7"];
+
+  /* date + crew metadata for sorting & filtering */
+  const TRIP_META = {
+    t1: { sort:"2025-02", years:[2025],      people:["Wife","Cooper"] },
+    t2: { sort:"2024-12", years:[2024,2025], people:["Wife","Cooper"] },
+    t3: { sort:"2024-08", years:[2024],      people:["Wife","Cooper"] },
+    t4: { sort:"2025-08", years:[2025],      people:["Aryan"] },
+    t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"] },
+    t6: { sort:"2025-10", years:[2025],      people:["Hrithik"] },
+    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"] }
+  };
+  const PEOPLE_LABELS = {
+    "Wife":"👩 Wife", "Cooper":"🐕 Cooper", "Parents":"👨‍👩‍👦 Mom & Dad",
+    "Aryan":"🧑 Aryan", "Hrithik":"🤜 Hrithik"
+  };
+
+  const DURATION = 5000;
+  const NS = "http://www.w3.org/2000/svg";
+
+  /* ================= HOME CARDS ================= */
+  function thumbSVG(trip){
+    const v = trip.thumbView;
+    const s = 620 / v.w;
+    const paths = trip.thumbPaths.map(d=>
+      `<path class="route-mini" d="${d}" stroke-width="${4/s}"/>`
+    ).join("");
+    return `<svg viewBox="${v.x} ${v.y} ${v.w} ${v.h}" xmlns="${NS}" preserveAspectRatio="xMidYMid slice">
+      <path class="india-outline" d="${INDIA_D}" style="stroke-width:${1.5/s}"/>
+      ${paths}
+    </svg>`;
+  }
+
+  let fYear = "all", fPerson = "all";
+
+  function buildFilters(){
+    const years = [...new Set(Object.values(TRIP_META).flatMap(m=>m.years))].sort();
+    const yWrap = document.getElementById("yearFilters");
+    yWrap.innerHTML = "";
+    ["all", ...years].forEach(y=>{
+      const b = document.createElement("button");
+      b.className = "fpill" + (String(fYear)===String(y) ? " active" : "");
+      b.textContent = y==="all" ? "🗓 All years" : y;
+      b.onclick = ()=>{ fYear = y; buildFilters(); buildHome(); };
+      yWrap.appendChild(b);
+    });
+    const pWrap = document.getElementById("peopleFilters");
+    pWrap.innerHTML = "";
+    const people = [...new Set(Object.values(TRIP_META).flatMap(m=>m.people))];
+    ["all", ...people].forEach(p=>{
+      const b = document.createElement("button");
+      b.className = "fpill" + (fPerson===p ? " active" : "");
+      b.textContent = p==="all" ? "🧳 Anyone" : (PEOPLE_LABELS[p] || p);
+      b.onclick = ()=>{ fPerson = p; buildFilters(); buildHome(); };
+      pWrap.appendChild(b);
+    });
+  }
+
+  function buildHome(){
+    const grid = document.getElementById("cardGrid");
+    grid.innerHTML = "";
+    const ids = TRIP_ORDER
+      .filter(id=>{
+        const m = TRIP_META[id];
+        return (fYear==="all" || m.years.includes(Number(fYear)))
+            && (fPerson==="all" || m.people.includes(fPerson));
+      })
+      .sort((a,b)=> TRIP_META[b].sort.localeCompare(TRIP_META[a].sort)); /* newest first */
+    ids.forEach(id=>{
+      const t = TRIPS[id];
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="thumb">${thumbSVG(t)}
+          <span class="badge">${t.badge}</span>
+        </div>
+        <button class="heart">♥</button>
+        <div class="meta">
+          <div class="row1"><b>${t.name}</b><span class="star">${t.rating}</span></div>
+          <div class="gray">${t.where}</div>
+          <div class="gray">${t.when}</div>
+          <div class="kms"><b>${t.totalLabel}</b></div>
+        </div>`;
+      card.querySelector(".heart").onclick = (e)=>{ e.stopPropagation(); e.target.classList.toggle("saved"); };
+      card.onclick = ()=> openTrip(id);
+      grid.appendChild(card);
+    });
+    /* someday card — only on the unfiltered view */
+    if(fYear==="all" && fPerson==="all"){
+      const ghost = document.createElement("div");
+      ghost.className = "card ghost";
+      ghost.innerHTML = `
+        <div class="thumb">🏔<br>The hills, slowly<br><small>a safe place to think · someday</small></div>
+        <div class="meta">
+          <div class="row1"><b>Next — TBD</b><span class="star">★ —</span></div>
+          <div class="gray">A week · a notebook · no itinerary</div>
+          <div class="kms"><b>Cooper is already on board</b></div>
+        </div>`;
+      grid.appendChild(ghost);
+    }
+  }
+
+  /* ================= MAP ENGINE ================= */
+  const routeLayer = document.getElementById("routeLayer");
+  const car = document.getElementById("car");
+  const kmEl = document.getElementById("km");
+  const hrsEl = document.getElementById("hrs");
+  const cityLayer = document.getElementById("cityLayer");
+  const chipsEl = document.getElementById("chips");
+
+  let curTrip = "t1", curLeg = -1, raf, state = null; /* curLeg -1 = full trip */
+
+  function computeCityTs(pathEl, cities){
+    const L = pathEl.getTotalLength();
+    const N = 400;
+    const pts = [];
+    for(let i=0;i<=N;i++) pts.push(pathEl.getPointAtLength(L*i/N));
+    return cities.map(c=>{
+      let best = 0, bestD = Infinity;
+      pts.forEach((p,i)=>{
+        const d = (p.x-c.x)**2 + (p.y-c.y)**2;
+        if(d < bestD){ bestD = d; best = i; }
+      });
+      return best/N;
+    });
+  }
+
+  function pulseCity(i){
+    const p = document.getElementById("pulse"+i);
+    const s = state ? state.scale : 1;
+    const start = performance.now();
+    (function grow(now){
+      const k = Math.min((now-start)/900, 1);
+      p.setAttribute("r", (6 + 20*k)/s);
+      p.style.opacity = 0.9*(1-k);
+      if(k<1) requestAnimationFrame(grow);
+    })(start);
+  }
+
+  const easeInOut = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+  function mount(){
+    const trip = TRIPS[curTrip];
+    const full = curLeg === -1;
+    const segments = full ? trip.legs : [trip.legs[curLeg]];
+    const view = full ? (trip.view || FULL_VIEW) : (trip.legs[curLeg].view || FULL_VIEW);
+    const s = 620 / view.w;
+    const svgEl = document.getElementById("mainMap");
+    svgEl.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+    svgEl.querySelector(".india-outline").style.strokeWidth = 1.5/s;
+    svgEl.querySelectorAll(".sea-label").forEach(t=> t.style.fontSize = (12/s)+"px");
+
+    /* build route paths: all base roads first, then all glows on top */
+    routeLayer.innerHTML = "";
+    const segStates = segments.map(seg=>{
+      const base = document.createElementNS(NS,"path");
+      base.setAttribute("class","route-base");
+      base.setAttribute("d", seg.path);
+      base.style.strokeWidth = 5/s;
+      routeLayer.appendChild(base);
+      return { seg };
+    });
+    segStates.forEach(st=>{
+      const glow = document.createElementNS(NS,"path");
+      glow.setAttribute("class","route-glow");
+      glow.setAttribute("d", st.seg.path);
+      glow.style.strokeWidth = 5/s;
+      routeLayer.appendChild(glow);
+      const len = glow.getTotalLength();
+      glow.style.strokeDasharray = len;
+      glow.style.strokeDashoffset = st.seg.reverse ? -len : len;
+      st.glow = glow; st.len = len;
+      st.cityTs = computeCityTs(glow, st.seg.cities);
+    });
+
+    /* union of cities across segments, in travel order */
+    const union = [], idxByName = {};
+    segments.forEach(seg=>{
+      const order = seg.reverse ? [...seg.cities].reverse() : seg.cities;
+      order.forEach(c=>{
+        if(!(c.name in idxByName)){ idxByName[c.name] = union.length; union.push(c); }
+      });
+    });
+
+    cityLayer.innerHTML = "";
+    union.forEach((c,i)=>{
+      const pulse = document.createElementNS(NS,"circle");
+      pulse.setAttribute("class","pulse"); pulse.setAttribute("cx",c.x); pulse.setAttribute("cy",c.y); pulse.setAttribute("r",6/s);
+      pulse.style.strokeWidth = 2/s;
+      pulse.id = "pulse"+i;
+      const dot = document.createElementNS(NS,"circle");
+      dot.setAttribute("class","city-dot"); dot.setAttribute("cx",c.x); dot.setAttribute("cy",c.y); dot.setAttribute("r",6/s);
+      dot.style.strokeWidth = 1.5/s;
+      dot.id = "dot"+i;
+      const label = document.createElementNS(NS,"text");
+      label.setAttribute("class","city-label");
+      label.setAttribute("x", c.x + c.dx/s); label.setAttribute("y", c.y + c.dy/s);
+      label.setAttribute("text-anchor", c.anchor);
+      label.style.fontSize = (13/s)+"px";
+      label.textContent = c.name;
+      label.id = "label"+i;
+      cityLayer.append(pulse, dot, label);
+    });
+
+    chipsEl.innerHTML = "";
+    union.forEach(c=>{
+      const chip = document.createElement("span");
+      chip.className = "chip"; chip.dataset.city = c.name; chip.textContent = c.name;
+      chipsEl.appendChild(chip);
+    });
+
+    if(full){
+      document.getElementById("legTitle").innerHTML = trip.fullTitle;
+      document.getElementById("legSub").textContent = trip.fullSub;
+    } else {
+      const leg = trip.legs[curLeg];
+      document.getElementById("legTitle").innerHTML = leg.title;
+      document.getElementById("legSub").textContent = leg.sub;
+    }
+    document.getElementById("replayBtn").textContent = full ? "Replay the whole trip" : "Replay this leg";
+
+    state = {
+      segStates, idxByName, union, scale: s, full,
+      totalHrs: segments.reduce((a,l)=>a+l.hrs,0)
+    };
+
+    /* park the car at the start */
+    const first = segStates[0];
+    const pt0 = first.glow.getPointAtLength(first.seg.reverse ? first.len : 0);
+    car.setAttribute("transform", `translate(${pt0.x},${pt0.y}) scale(${1/s})`);
+  }
+
+  function run(){
+    if(!state) return;
+    cancelAnimationFrame(raf);
+    const { segStates, idxByName, union, scale, totalHrs } = state;
+
+    /* reset */
+    segStates.forEach(st=>{
+      st.glow.style.strokeDashoffset = st.seg.reverse ? -st.len : st.len;
+    });
+    union.forEach((_,i)=>{
+      document.getElementById("dot"+i).classList.remove("lit");
+      document.getElementById("label"+i).classList.remove("lit");
+    });
+    document.querySelectorAll(".chip").forEach(ch=>ch.classList.remove("lit"));
+    const lit = new Array(union.length).fill(false);
+
+    const segDur = segStates.length > 1 ? 4000 : 5000;
+    let kmBase = 0, hrsBase = 0, k = 0;
+
+    function runSeg(){
+      const st = segStates[k];
+      const seg = st.seg, len = st.len, rev = !!seg.reverse;
+      const t0 = performance.now();
+
+      function frame(now){
+        const raw = Math.min((now-t0)/segDur, 1);
+        const p = easeInOut(raw);
+        const pos = rev ? (1-p) : p;
+
+        st.glow.style.strokeDashoffset = rev ? -len*(1-p) : len*(1-p);
+
+        const pt = st.glow.getPointAtLength(len * pos);
+        const step = rev ? -2 : 2;
+        const aheadLen = Math.max(0, Math.min(len*pos + step, len));
+        const ahead = st.glow.getPointAtLength(aheadLen);
+        const angle = Math.atan2(ahead.y-pt.y, ahead.x-pt.x) * 180/Math.PI;
+        car.setAttribute("transform", `translate(${pt.x},${pt.y}) rotate(${angle}) scale(${1/scale})`);
+
+        kmEl.textContent = Math.round(kmBase + seg.km * p).toLocaleString("en-IN");
+        const h = hrsBase + seg.hrs * p;
+        hrsEl.textContent = totalHrs < 10 ? (Math.round(h*10)/10) : Math.round(h);
+
+        seg.cities.forEach((c,i)=>{
+          const reach = rev ? (1 - st.cityTs[i]) : st.cityTs[i];
+          if(p >= reach - 0.005){
+            const ui = idxByName[c.name];
+            if(!lit[ui]){
+              lit[ui] = true;
+              document.getElementById("dot"+ui).classList.add("lit");
+              document.getElementById("label"+ui).classList.add("lit");
+              const chip = document.querySelector(`.chip[data-city="${c.name}"]`);
+              if(chip) chip.classList.add("lit");
+              pulseCity(ui);
+            }
+          }
+        });
+
+        if(raw < 1){
+          raf = requestAnimationFrame(frame);
+        } else {
+          st.glow.style.strokeDashoffset = 0;
+          kmBase += seg.km; hrsBase += seg.hrs;
+          k++;
+          if(k < segStates.length) runSeg();
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    runSeg();
+  }
+
+  /* ================= RENDER / NAV ================= */
+  function renderTrip(){
+    const trip = TRIPS[curTrip];
+    document.getElementById("tripTitle").textContent = `${trip.name} — ${trip.where}`;
+
+    const sub = document.getElementById("tripSub");
+    sub.innerHTML = trip.subline.map(x=>
+      x === '·' ? '<span class="dotsep">·</span>'
+      : x.startsWith('★') ? `<span class="underl">${x}</span>`
+      : `<span class="${/\d/.test(x) ? 'gray' : ''}">${x}</span>`
+    ).join(" ");
+
+    const facts = document.getElementById("facts");
+    facts.innerHTML = "";
+    trip.facts.forEach(f=>{
+      const d = document.createElement("div");
+      d.className = "fact";
+      d.innerHTML = `<div class="ico">${f.i}</div><div><div class="k">${f.k}</div><div class="s">${f.s}</div></div>`;
+      facts.appendChild(d);
+    });
+
+    document.getElementById("noteLink").style.display = trip.hasNote ? "inline-flex" : "none";
+
+    const tabs = document.getElementById("legTabs");
+    tabs.innerHTML = "";
+    const full = document.createElement("button");
+    full.className = "leg-tab" + (curLeg===-1 ? " active" : "");
+    full.textContent = "🗺 Full trip";
+    full.onclick = ()=>{ curLeg = -1; renderTrip(); mount(); run(); };
+    tabs.appendChild(full);
+    trip.legs.forEach((l,i)=>{
+      const b = document.createElement("button");
+      b.className = "leg-tab" + (i===curLeg ? " active" : "");
+      b.textContent = l.tab;
+      b.onclick = ()=>{ curLeg = i; renderTrip(); mount(); run(); };
+      tabs.appendChild(b);
+    });
+  }
+
+  function setPage(id){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+    document.getElementById(id).classList.add("on");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function goHome(){
+    cancelAnimationFrame(raf);
+    setPage("page-home");
+  }
+
+  function openTrip(id, legIdx){
+    cancelAnimationFrame(raf);
+    curTrip = id;
+    curLeg = legIdx ?? -1;  /* default: play the whole trip */
+    setPage("page-trip");
+    renderTrip(); mount();
+    setTimeout(run, 350);
+  }
+
+  function showNote(){
+    cancelAnimationFrame(raf);
+    setPage("page-note");
+  }
+
+  window.addEventListener("load", ()=>{ buildFilters(); buildHome(); });
+</script>
+</body>
+</html>
