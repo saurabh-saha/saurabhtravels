@@ -340,6 +340,11 @@
       border-radius:22px;
     }
     .searchpill .pill-row{padding:0 4px}
+    /* search bar is only useful for browsing trips — hide it on mobile
+       once you're already inside a trip, the note, or the about page */
+    body[data-page="page-trip"] .searchpill,
+    body[data-page="page-note"] .searchpill,
+    body[data-page="page-about"] .searchpill{display:none}
     .searchpill .pill-row{
       flex:1 1 100%;display:flex;align-items:center;min-width:0;
     }
@@ -1400,6 +1405,7 @@
   function setPage(id){
     document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
     document.getElementById(id).classList.add("on");
+    document.body.dataset.page = id;
     window.scrollTo({top:0, behavior:"smooth"});
   }
 
