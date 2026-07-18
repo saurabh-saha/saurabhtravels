@@ -304,14 +304,30 @@
   @media (max-width:900px){
     .searchpill .seg.hidesm, .searchpill .div.hidesm{display:none}
   }
+  /* hostlink avatar: real 44px touch target at every size, circle just sits inside it */
+  .hostlink{padding:2px}
+  .avatar-tap{
+    width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:none;border:none;cursor:pointer;flex-shrink:0;
+  }
+  .avatar-tap:hover{background:var(--chipbg)}
   @media (max-width:640px){
-    header{padding:10px 4vw;gap:10px}
-    .logo .mark{font-size:22px}
-    .logo .word{font-size:17px}
-    .searchpill{padding:6px 6px 6px 14px;font-size:12.5px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
-    .searchpill .seg{padding:0 8px}
-    .searchpill .go{width:28px;height:28px}
-    .avatar{width:32px;height:32px;font-size:12.5px}
+    header{padding:8px 4vw;gap:6px;flex-wrap:nowrap}
+    .logo{gap:6px;flex-shrink:0}
+    .logo .mark{font-size:20px}
+    .logo .word{font-size:15px}
+    .searchpill{
+      flex:1 1 auto;min-width:0;padding:6px 4px 6px 12px;font-size:12.5px;
+      box-shadow:0 2px 8px rgba(0,0,0,.07);
+    }
+    .searchpill .seg{
+      padding:0 6px;flex:1 1 0;min-width:0;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap;text-align:left;
+    }
+    .searchpill .div{flex-shrink:0}
+    .searchpill .go{width:26px;height:26px;flex-shrink:0;font-size:12px}
+    .avatar-tap{width:40px;height:40px}
+    .avatar{width:30px;height:30px;font-size:12px}
     .home-head{padding:22px 0 4px}
     .home-head h1{font-size:22px}
     .trip-title h1{font-size:22px}
@@ -326,8 +342,29 @@
     footer{flex-direction:column;text-align:center;gap:6px}
   }
   @media (max-width:460px){
-    .searchpill .seg.gray{display:none}
+    .searchpill{padding:6px 2px 6px 10px}
+    .searchpill .seg{padding:0 4px;font-size:11.5px}
+  }
+  @media (max-width:380px){
     .searchpill .div{display:none}
+    .searchpill .seg{padding:0 3px}
+  }
+
+  /* ============ GALLERY ============ */
+  .gallery-sec{padding:6px 0 4px}
+  .gallery-sec h2{font-size:18px;font-weight:700;margin-bottom:14px}
+  .gallery-strip{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .gallery-strip::-webkit-scrollbar{height:6px}
+  .gallery-strip::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+  .gallery-item{flex:0 0 auto;width:240px;scroll-snap-align:start}
+  .gallery-item img,.gallery-item video{
+    width:100%;height:170px;object-fit:cover;border-radius:14px;
+    display:block;background:var(--chipbg);
+  }
+  .gallery-cap{font-size:12.5px;color:var(--gray);margin-top:7px;padding:0 1px;line-height:1.4}
+  @media (max-width:640px){
+    .gallery-item{width:200px}
+    .gallery-item img,.gallery-item video{height:145px}
   }
 </style>
 </head>
@@ -349,7 +386,9 @@
   </div>
   <div class="dd" id="searchDD" onclick="event.stopPropagation()"></div>
   <div class="hostlink">
-    <div class="avatar" onclick="navigate('#/about')" title="About Saurabh">S</div>
+    <button class="avatar-tap" onclick="navigate('#/about')" title="About Saurabh" aria-label="About Saurabh">
+      <span class="avatar">S</span>
+    </button>
   </div>
 </header>
 
@@ -360,7 +399,7 @@
     <div class="wrap">
       <div class="home-head">
         <h1>Past drives</h1>
-        <p>Seven trips and counting — a wife, a dog, parents, a friend, a brother, one hatchback.</p>
+        <p>Nine trips and counting — a wife, two dogs, parents, a friend, a brother, one hatchback.</p>
       </div>
       <div class="grid" id="cardGrid"></div>
     </div>
@@ -421,6 +460,11 @@
         </div>
       </div>
 
+      <div class="gallery-sec" id="gallerySec" style="display:none">
+        <h2>From the road</h2>
+        <div class="gallery-strip" id="galleryStrip"></div>
+      </div>
+
       <div class="facts-sec">
         <h2>What this trip offers</h2>
         <div class="facts" id="facts"></div>
@@ -471,7 +515,7 @@
         <div class="hname">Saurabh</div>
         <div class="hsub">Web developer · Bengaluru</div>
         <div class="host-stats">
-          <div class="hs"><div class="hv">7</div><div class="hk">road trips</div></div>
+          <div class="hs"><div class="hv">9</div><div class="hk">road trips</div></div>
           <div class="hs"><div class="hv">15,000+ km</div><div class="hk">driven across India</div></div>
           <div class="hs"><div class="hv">2024</div><div class="hk">started driving</div></div>
           <div class="hs"><div class="hv">2 dogs</div><div class="hk">Cooper 🐕 & Teddy 🐩</div></div>
@@ -507,6 +551,8 @@
   const EAST_CITIES = [
     { name:"Siliguri",       x:462, y:205, anchor:"start", dx:12,  dy:-6  },
     { name:"Kolkata",        x:446, y:300, anchor:"start", dx:12,  dy:4   },
+    { name:"Kharagpur",      x:438, y:326, anchor:"end",   dx:-10, dy:2   },
+    { name:"Mandarmani",     x:452, y:340, anchor:"start", dx:8,   dy:8   },
     { name:"Bhubaneswar",    x:418, y:364, anchor:"end",   dx:-12, dy:4   },
     { name:"Visakhapatnam",  x:388, y:428, anchor:"end",   dx:-12, dy:4   },
     { name:"Vijayawada",     x:346, y:484, anchor:"end",   dx:-12, dy:4   },
@@ -519,6 +565,7 @@
     { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 },
     { name:"Hyderabad",  x:290, y:455, anchor:"start", dx:12,  dy:4  },
     { name:"Nagpur",     x:300, y:370, anchor:"start", dx:12,  dy:4  },
+    { name:"Jabalpur",   x:295, y:322, anchor:"start", dx:12,  dy:4  },
     { name:"Jhansi",     x:285, y:275, anchor:"start", dx:12,  dy:4  },
     { name:"Delhi",      x:268, y:185, anchor:"start", dx:12,  dy:4  },
     { name:"Chandigarh", x:268, y:138, anchor:"start", dx:12,  dy:-4 }
@@ -531,6 +578,7 @@
     { name:"Jaipur",     x:230, y:238, anchor:"end",   dx:-12, dy:4  },
     { name:"Kota",       x:228, y:288, anchor:"end",   dx:-12, dy:4  },
     { name:"Indore",     x:240, y:352, anchor:"end",   dx:-12, dy:4  },
+    { name:"Ellora Caves", x:222, y:408, anchor:"end", dx:-12, dy:4  },
     { name:"Pune",       x:200, y:465, anchor:"end",   dx:-12, dy:4  },
     { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 }
   ];
@@ -620,16 +668,21 @@
       view: FULL_VIEW,
       fullTitle: 'Full trip <span>→ there & back</span>',
       fullSub: "Bengaluru → Siliguri → Bengaluru · NH 16 both ways",
+      gallery: [
+        { type:"img", src:"images/manadarmani.jpg", caption:"The beach drive at Mandarmani — where parents joined for a stretch" },
+        { type:"img", src:"images/siliguri.jpg", caption:"Quiet skies near Siliguri, almost there" },
+        { type:"video", src:"videos/siliguri-gopalpur.mp4", caption:"On the road to Gopalpur, Odisha" }
+      ],
       facts: [
         { i:"🗓", k:"February 2025", s:"the gap between university and the first day of work" },
         { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh drove, wife ran the playlist" },
         { i:"🐕", k:"Saurabh · Wife · Cooper", s:"golden retriever, chief window inspector" },
-        { i:"🛣", k:"NH 16, east coast", s:"~2,456 km each way · same road both ways" }
+        { i:"🛣", k:"NH 16, east coast", s:"~2,456 km each way · a Kharagpur–Mandarmani detour where parents joined" }
       ],
       legs: [
         { tab:"↑ Onward — Bengaluru → Siliguri",
           title:'Onward <span>→ the mountains</span>',
-          sub:"Bengaluru → Siliguri · NH 16 up the coast",
+          sub:"Bengaluru → Siliguri · via a Kharagpur–Mandarmani beach detour",
           path:EAST_PATH, cities:EAST_CITIES, reverse:true,  km:2456, hrs:44 },
         { tab:"↓ Return — Siliguri → Bengaluru",
           title:'Return <span>→ home</span>',
@@ -651,11 +704,16 @@
       view: FULL_VIEW,
       fullTitle: 'Full trip <span>→ the winter loop</span>',
       fullSub: "Up NH 44 via Nagpur · home via Rishikesh, Jaipur & Kota",
+      gallery: [
+        { type:"img", src:"images/chandigarg-jabalpur.jpg", caption:"Somewhere between Nagpur and Jabalpur" },
+        { type:"img", src:"images/chandigarg-back-jaipur.jpg", caption:"An early morning stop through Rajasthan" },
+        { type:"img", src:"images/chandigarg-back-jaipur-sunset.jpg", caption:"Sunset on the way back, near Jaipur" }
+      ],
       facts: [
         { i:"🗓", k:"Dec 2024 – Jan 2025", s:"the winter escape, new year on the road" },
         { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh & Hrithik shared the wheel" },
         { i:"🐕", k:"Saurabh · Hrithik · Manasa · Wife · Cooper", s:"full car — Cooper's first Himalayan winter" },
-        { i:"🛣", k:"Up NH 44 · back the scenic way", s:"via Nagpur up · Rishikesh, Jaipur & Kota home" }
+        { i:"🛣", k:"Up NH 44 · back the scenic way", s:"via Nagpur up · Rishikesh, Jaipur, Kota & Ellora Caves home" }
       ],
       legs: [
         { tab:"↑ Onward — via Nagpur",
@@ -664,7 +722,7 @@
           path:NH44_PATH, cities:NH44_CITIES, reverse:false, km:2412, hrs:42 },
         { tab:"↓ Return — Rishikesh · Jaipur · Kota",
           title:'Return <span>→ the long way home</span>',
-          sub:"Chandigarh → Rishikesh → Jaipur → Kota → Bengaluru",
+          sub:"Chandigarh → Rishikesh → Jaipur → Kota → Ellora Caves → Bengaluru",
           path:RETURN_PATH, cities:RETURN_CITIES, reverse:false, km:2700, hrs:48 }
       ]
     },
@@ -717,6 +775,9 @@
       view: PONDY_VIEW,
       fullTitle: 'Full trip <span>→ the weekend dash</span>',
       fullSub: "Bengaluru → Pondicherry → Bengaluru · via Tiruvannamalai",
+      gallery: [
+        { type:"img", src:"images/pondi-aryan.jpg", caption:"Fishing boats on the way into Pondicherry" }
+      ],
       facts: [
         { i:"🗓", k:"August 2025", s:"a long weekend, booked on a Thursday" },
         { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh & Aryan shared the wheel" },
@@ -810,6 +871,11 @@
       view: VARKALA_VIEW,
       fullTitle: 'Full trip <span>→ down the whole coast</span>',
       fullSub: "Bengaluru → Kochi → Varkala → Bengaluru · NH 544 & NH 66",
+      gallery: [
+        { type:"img", src:"images/varkala.jpg", caption:"Pool view over the trees, Varkala" },
+        { type:"img", src:"images/varkala2.jpg", caption:"The cliff view over Varkala beach" },
+        { type:"img", src:"images/varkala3.jpg", caption:"Parked under the palms" }
+      ],
       facts: [
         { i:"🗓", k:"January 2026", s:"starting the year at the cliff edge" },
         { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh drove the whole coast" },
@@ -826,9 +892,74 @@
           sub:"Varkala → Bengaluru · sand in every seat crevice",
           path:VARKALA_PATH, cities:VARKALA_CITIES, reverse:true, km:755, hrs:14, view:VARKALA_VIEW }
       ]
+    },
+    t8: {
+      name: "Pondy, Round Two",
+      where: "Bengaluru ↔ Pondicherry",
+      when: "Sep 2024",
+      totalLabel: "~640 km round trip",
+      badge: "A quieter Pondy",
+      rating: "★ 4.9",
+      subline: ['★ 4.9', '·', "Cooper's first French quarter", '·', '3 travellers', '·', 'Sep 2024 — a quiet weekend away'],
+      thumbView: PONDY_VIEW,
+      thumbPaths: [PONDY_PATH],
+      hasNote: false,
+      view: PONDY_VIEW,
+      fullTitle: 'Full trip <span>→ a quieter Pondy</span>',
+      fullSub: "Bengaluru → Pondicherry → Bengaluru · via Tiruvannamalai",
+      facts: [
+        { i:"🗓", k:"September 2024", s:"a quiet weekend away, no big plan" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh drove, Cooper supervised" },
+        { i:"🐕", k:"Saurabh · Wife · Cooper", s:"Cooper's first look at the French quarter" },
+        { i:"🛣", k:"Via Tiruvannamalai & Gingee", s:"~320 km each way · same route as the boys' trip, a year earlier" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Pondy",
+          title:'Going <span>→ the French quarter</span>',
+          sub:"Bengaluru → Krishnagiri → Tiruvannamalai → Pondicherry",
+          path:PONDY_PATH, cities:PONDY_CITIES, reverse:false, km:320, hrs:6, view:PONDY_VIEW },
+        { tab:"↓ Back — Pondy → BLR",
+          title:'Return <span>→ back to Monday</span>',
+          sub:"Pondicherry → Bengaluru · quieter than the trip back with Aryan",
+          path:PONDY_PATH, cities:PONDY_CITIES, reverse:true, km:320, hrs:6, view:PONDY_VIEW }
+      ]
+    },
+    t9: {
+      name: "Biryani, Take Two",
+      where: "Bengaluru ↔ Hyderabad",
+      when: "May 2025",
+      totalLabel: "~1,140 km round trip",
+      badge: "Family & Cooper",
+      rating: "★ 4.9",
+      subline: ['★ 4.9', '·', 'Hussain Sagar at night', '·', '4 travellers', '·', 'May 2025 — a family biryani run'],
+      thumbView: HYD_VIEW,
+      thumbPaths: [HYD_PATH],
+      hasNote: false,
+      view: HYD_VIEW,
+      fullTitle: 'Full trip <span>→ biryani, family style</span>',
+      fullSub: "Bengaluru → Hyderabad → Bengaluru · NH 44 all the way",
+      gallery: [
+        { type:"img", src:"images/hyderabad-wifey.jpg", caption:"Hussain Sagar at night, Buddha statue lit up across the water" }
+      ],
+      facts: [
+        { i:"🗓", k:"May 2025", s:"a family run up NH 44, months before the brothers' rematch" },
+        { i:"🚗", k:"Hyundai i20 automatic", s:"Saurabh & Hrithik shared the wheel" },
+        { i:"🐕", k:"Saurabh · Wife · Hrithik · Cooper", s:"the full crew, minus Manasa this time" },
+        { i:"🛣", k:"NH 44 via Anantapur & Kurnool", s:"~570 km each way · a lakeside evening at Hussain Sagar" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Hyderabad",
+          title:'Going <span>→ the biryani</span>',
+          sub:"Bengaluru → Anantapur → Kurnool → Hyderabad · NH 44",
+          path:HYD_PATH, cities:HYD_CITIES, reverse:false, km:570, hrs:9, view:HYD_VIEW },
+        { tab:"↓ Back — Hyderabad → BLR",
+          title:'Return <span>→ home, well fed</span>',
+          sub:"Hyderabad → Bengaluru · same road as October, five months early",
+          path:HYD_PATH, cities:HYD_CITIES, reverse:true, km:570, hrs:9, view:HYD_VIEW }
+      ]
     }
   };
-  const TRIP_ORDER = ["t1","t2","t3","t4","t5","t6","t7"];
+  const TRIP_ORDER = ["t1","t2","t3","t4","t5","t6","t7","t8","t9"];
 
   /* date + crew metadata for sorting & filtering */
   const TRIP_META = {
@@ -838,7 +969,9 @@
     t4: { sort:"2025-08", years:[2025],      people:["Aryan"] },
     t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"] },
     t6: { sort:"2025-10", years:[2025],      people:["Hrithik"] },
-    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"] }
+    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"] },
+    t8: { sort:"2024-09", years:[2024],      people:["Wife","Cooper"] },
+    t9: { sort:"2025-05", years:[2025],      people:["Wife","Cooper","Hrithik"] }
   };
   const PEOPLE_LABELS = {
     "Wife":"👩 Wife", "Cooper":"🐕 Cooper", "Parents":"👨‍👩‍👦 Mom & Dad",
@@ -886,10 +1019,22 @@
   const cityTripCount = city => TRIP_ORDER.filter(id=> tripHasCity(id, city)).length;
 
   function updateSegLabels(){
-    document.getElementById("segCity").textContent = fCity==="all" ? "Anywhere in India" : fCity;
-    document.getElementById("segYear").textContent = fYear==="all" ? "Any year" : fYear;
-    document.getElementById("segWho").textContent  = fPerson==="all" ? "With anyone 🐾" : "With " + (PEOPLE_LABELS[fPerson] || fPerson);
+    const compact = window.innerWidth <= 640;
+    document.getElementById("segCity").textContent = fCity==="all"
+      ? (compact ? "📍 Anywhere" : "Anywhere in India")
+      : (compact ? "📍 "+fCity : fCity);
+    document.getElementById("segYear").textContent = fYear==="all"
+      ? (compact ? "🗓 Any year" : "Any year")
+      : (compact ? "🗓 "+fYear : fYear);
+    document.getElementById("segWho").textContent = fPerson==="all"
+      ? (compact ? "🐾 Anyone" : "With anyone 🐾")
+      : (compact ? (PEOPLE_LABELS[fPerson] || fPerson) : "With " + (PEOPLE_LABELS[fPerson] || fPerson));
   }
+  let segResizeT;
+  window.addEventListener("resize", ()=>{
+    clearTimeout(segResizeT);
+    segResizeT = setTimeout(updateSegLabels, 150);
+  });
 
   let ddOpen = null;
   function openPanel(kind, ev){
@@ -967,19 +1112,6 @@
       card.onclick = ()=> openTrip(id);
       grid.appendChild(card);
     });
-    /* someday card — only on the unfiltered view */
-    if(fYear==="all" && fPerson==="all" && fCity==="all"){
-      const ghost = document.createElement("div");
-      ghost.className = "card ghost";
-      ghost.innerHTML = `
-        <div class="thumb">🏔<br>The hills, slowly<br><small>a safe place to think · someday</small></div>
-        <div class="meta">
-          <div class="row1"><b>Next — TBD</b><span class="star">★ —</span></div>
-          <div class="gray">A week · a notebook · no itinerary</div>
-          <div class="kms"><b>Cooper is already on board</b></div>
-        </div>`;
-      grid.appendChild(ghost);
-    }
   }
 
   /* ================= MAP ENGINE ================= */
@@ -1205,6 +1337,21 @@
     });
 
     document.getElementById("noteLink").style.display = trip.hasNote ? "inline-flex" : "none";
+
+    const gallerySec = document.getElementById("gallerySec");
+    const galleryStrip = document.getElementById("galleryStrip");
+    if(trip.gallery && trip.gallery.length){
+      galleryStrip.innerHTML = trip.gallery.map(g=>{
+        const media = g.type === "video"
+          ? `<video src="${g.src}" controls playsinline preload="metadata"></video>`
+          : `<img src="${g.src}" alt="${g.caption}" loading="lazy">`;
+        return `<div class="gallery-item">${media}<div class="gallery-cap">${g.caption}</div></div>`;
+      }).join("");
+      gallerySec.style.display = "block";
+    } else {
+      gallerySec.style.display = "none";
+      galleryStrip.innerHTML = "";
+    }
 
     const tabs = document.getElementById("legTabs");
     tabs.innerHTML = "";
