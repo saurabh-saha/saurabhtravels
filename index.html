@@ -76,16 +76,33 @@
   .home-head h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
   .home-head p{color:var(--gray);font-size:15px;margin-top:4px}
 
-  .filters{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:20px 0 0}
-  .fgroup{display:flex;gap:8px;flex-wrap:wrap}
-  .fdiv{width:1px;height:26px;background:var(--line)}
-  .fpill{
-    border:1px solid var(--line);border-radius:999px;background:#fff;
-    padding:8px 16px;font-size:13.5px;font-weight:600;color:var(--gray);
-    transition:all .15s;
+  /* search dropdown panels */
+  .searchpill .seg{background:none;border:none;color:inherit}
+  .searchpill .seg:hover{color:var(--rausch)}
+  .dd{
+    display:none;position:fixed;top:66px;left:50%;transform:translateX(-50%);
+    background:#fff;border:1px solid var(--line2);border-radius:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.16);
+    padding:14px;z-index:60;min-width:280px;max-width:88vw;
+    max-height:62vh;overflow:auto;
   }
-  .fpill:hover{border-color:var(--ink);color:var(--ink)}
-  .fpill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .dd.open{display:block}
+  .dd-title{font-size:11.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin:4px 10px 10px}
+  .dd-opt{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    width:100%;text-align:left;background:none;border:none;border-radius:12px;
+    padding:11px 12px;font-size:14.5px;font-weight:500;color:var(--ink);
+  }
+  .dd-opt:hover{background:var(--chipbg)}
+  .dd-opt .sub{color:var(--gray);font-size:12.5px;font-weight:400}
+  .dd-opt.sel{font-weight:700}
+  .dd-opt.sel::after{content:"✓";color:var(--rausch);font-weight:800}
+  .dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .empty-state{
+    grid-column:1/-1;text-align:center;color:var(--gray);
+    padding:60px 20px;font-size:15px;
+  }
+  .empty-state b{color:var(--ink)}
 
   .grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));
@@ -284,14 +301,15 @@
     <span class="mark">🧭</span>
     <span class="word">saurabh<span>.travels</span></span>
   </div>
-  <div class="searchpill" onclick="goHome()">
-    <span class="seg">Anywhere in India</span>
+  <div class="searchpill">
+    <button class="seg" id="segCity" onclick="openPanel('city',event)">Anywhere in India</button>
     <span class="div"></span>
-    <span class="seg hidesm">Jul '24 – Jan '26</span>
+    <button class="seg hidesm" id="segYear" onclick="openPanel('year',event)">Any year</button>
     <span class="div hidesm"></span>
-    <span class="seg gray">With Cooper 🐾</span>
-    <button class="go">⌕</button>
+    <button class="seg gray" id="segWho" onclick="openPanel('who',event)">With anyone 🐾</button>
+    <button class="go" onclick="goHome()">⌕</button>
   </div>
+  <div class="dd" id="searchDD" onclick="event.stopPropagation()"></div>
   <div class="hostlink">
     <div class="avatar">S</div>
   </div>
@@ -305,11 +323,6 @@
       <div class="home-head">
         <h1>Past drives</h1>
         <p>Seven trips and counting — a wife, a dog, parents, a friend, a brother, one hatchback.</p>
-      </div>
-      <div class="filters">
-        <div class="fgroup" id="yearFilters"></div>
-        <div class="fdiv"></div>
-        <div class="fgroup" id="peopleFilters"></div>
       </div>
       <div class="grid" id="cardGrid"></div>
     </div>
@@ -790,30 +803,65 @@
     </svg>`;
   }
 
-  let fYear = "all", fPerson = "all";
+  /* ---- search state: city / year / person ---- */
+  let fCity = "all", fYear = "all", fPerson = "all";
 
-  function buildFilters(){
-    const years = [...new Set(Object.values(TRIP_META).flatMap(m=>m.years))].sort();
-    const yWrap = document.getElementById("yearFilters");
-    yWrap.innerHTML = "";
-    ["all", ...years].forEach(y=>{
-      const b = document.createElement("button");
-      b.className = "fpill" + (String(fYear)===String(y) ? " active" : "");
-      b.textContent = y==="all" ? "🗓 All years" : y;
-      b.onclick = ()=>{ fYear = y; buildFilters(); buildHome(); };
-      yWrap.appendChild(b);
-    });
-    const pWrap = document.getElementById("peopleFilters");
-    pWrap.innerHTML = "";
-    const people = [...new Set(Object.values(TRIP_META).flatMap(m=>m.people))];
-    ["all", ...people].forEach(p=>{
-      const b = document.createElement("button");
-      b.className = "fpill" + (fPerson===p ? " active" : "");
-      b.textContent = p==="all" ? "🧳 Anyone" : (PEOPLE_LABELS[p] || p);
-      b.onclick = ()=>{ fPerson = p; buildFilters(); buildHome(); };
-      pWrap.appendChild(b);
-    });
+  const ALL_CITIES = [...new Set(
+    Object.values(TRIPS).flatMap(t=> t.legs.flatMap(l=> l.cities.map(c=>c.name)))
+  )].sort();
+  const ALL_YEARS = [...new Set(Object.values(TRIP_META).flatMap(m=>m.years))].sort();
+  const ALL_PEOPLE = [...new Set(Object.values(TRIP_META).flatMap(m=>m.people))];
+
+  const tripHasCity = (id, city)=> TRIPS[id].legs.some(l=> l.cities.some(c=> c.name===city));
+  const cityTripCount = city => TRIP_ORDER.filter(id=> tripHasCity(id, city)).length;
+
+  function updateSegLabels(){
+    document.getElementById("segCity").textContent = fCity==="all" ? "Anywhere in India" : fCity;
+    document.getElementById("segYear").textContent = fYear==="all" ? "Any year" : fYear;
+    document.getElementById("segWho").textContent  = fPerson==="all" ? "With anyone 🐾" : "With " + (PEOPLE_LABELS[fPerson] || fPerson);
   }
+
+  let ddOpen = null;
+  function openPanel(kind, ev){
+    ev.stopPropagation();
+    const dd = document.getElementById("searchDD");
+    if(ddOpen === kind){ closePanel(); return; }
+    ddOpen = kind;
+    let html = "";
+    const opt = (val, label, sub, sel)=>
+      `<button class="dd-opt${sel?" sel":""}" onclick="pick('${kind}','${String(val).replace(/'/g,"\\'")}')">
+         <span>${label}${sub?` <span class="sub">· ${sub}</span>`:""}</span></button>`;
+    if(kind==="city"){
+      html = `<div class="dd-title">Where did we drive?</div><div class="dd-grid">`
+        + opt("all","🇮🇳 Anywhere in India","",fCity==="all")
+        + ALL_CITIES.map(c=> opt(c, c, cityTripCount(c)+(cityTripCount(c)>1?" trips":" trip"), fCity===c)).join("")
+        + `</div>`;
+    } else if(kind==="year"){
+      html = `<div class="dd-title">Which year?</div>`
+        + opt("all","🗓 Any year","",fYear==="all")
+        + ALL_YEARS.map(y=> opt(y, y, TRIP_ORDER.filter(id=>TRIP_META[id].years.includes(y)).length+" trips", String(fYear)===String(y))).join("");
+    } else {
+      html = `<div class="dd-title">Who came along?</div>`
+        + opt("all","🧳 Anyone","",fPerson==="all")
+        + ALL_PEOPLE.map(p=> opt(p, PEOPLE_LABELS[p]||p, TRIP_ORDER.filter(id=>TRIP_META[id].people.includes(p)).length+" trips", fPerson===p)).join("");
+    }
+    dd.innerHTML = html;
+    dd.classList.add("open");
+  }
+  function closePanel(){
+    ddOpen = null;
+    document.getElementById("searchDD").classList.remove("open");
+  }
+  function pick(kind, val){
+    if(kind==="city") fCity = val;
+    else if(kind==="year") fYear = val;
+    else fPerson = val;
+    closePanel();
+    updateSegLabels();
+    if(!document.getElementById("page-home").classList.contains("on")) goHome();
+    else buildHome();
+  }
+  document.addEventListener("click", closePanel);
 
   function buildHome(){
     const grid = document.getElementById("cardGrid");
@@ -822,9 +870,14 @@
       .filter(id=>{
         const m = TRIP_META[id];
         return (fYear==="all" || m.years.includes(Number(fYear)))
-            && (fPerson==="all" || m.people.includes(fPerson));
+            && (fPerson==="all" || m.people.includes(fPerson))
+            && (fCity==="all" || tripHasCity(id, fCity));
       })
       .sort((a,b)=> TRIP_META[b].sort.localeCompare(TRIP_META[a].sort)); /* newest first */
+    if(ids.length === 0){
+      grid.innerHTML = `<div class="empty-state">No trips match that search.<br><b>Cooper suggests widening it. 🐾</b></div>`;
+      return;
+    }
     ids.forEach(id=>{
       const t = TRIPS[id];
       const card = document.createElement("div");
@@ -845,7 +898,7 @@
       grid.appendChild(card);
     });
     /* someday card — only on the unfiltered view */
-    if(fYear==="all" && fPerson==="all"){
+    if(fYear==="all" && fPerson==="all" && fCity==="all"){
       const ghost = document.createElement("div");
       ghost.className = "card ghost";
       ghost.innerHTML = `
@@ -1150,7 +1203,7 @@
     } else {
       document.title = "saurabh.travels — drives, dogs & thinking";
       setPage("page-home");
-      buildFilters(); buildHome();
+      updateSegLabels(); buildHome();
     }
   }
 
