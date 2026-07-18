@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>saurabh.travels — drives, dogs & thinking</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
   :root{
     --rausch:#FF385C;
@@ -163,23 +167,22 @@
   .card{cursor:pointer;position:relative}
   .card .thumb{
     aspect-ratio:20/19;border-radius:14px;overflow:hidden;
-    background:var(--water);position:relative;
+    background:var(--water);position:relative;z-index:0;
     transition:transform .25s;
   }
   .card:hover .thumb{transform:scale(1.015)}
-  .card .thumb svg{width:100%;height:100%;display:block}
   .card .heart{
     position:absolute;top:12px;right:12px;font-size:22px;
     color:rgba(0,0,0,.45);-webkit-text-stroke:2px #fff;
     background:none;border:none;line-height:1;
-    transition:transform .15s;
+    transition:transform .15s;z-index:1;
   }
   .card .heart:hover{transform:scale(1.15)}
   .card .heart.saved{color:var(--rausch)}
   .card .badge{
     position:absolute;top:12px;left:12px;background:#fff;
     border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;
-    box-shadow:0 2px 8px rgba(0,0,0,.12);
+    box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:800;
   }
   .card .meta{padding:10px 2px 0;font-size:14.5px;line-height:1.4}
   .card .row1{display:flex;justify-content:space-between;gap:8px}
@@ -224,8 +227,9 @@
   .map-wrap{
     flex:1 1 460px;max-width:660px;
     background:var(--water);border-radius:18px;overflow:hidden;
+    position:relative;z-index:0;
   }
-  .map-wrap svg{width:100%;height:auto;display:block}
+  #mainMap{width:100%;height:540px;background:var(--water)}
 
   .bookcard{
     flex:0 1 330px;min-width:290px;
@@ -278,20 +282,29 @@
   }
   .notelink:hover{background:var(--chipbg)}
 
-  /* map svg (light theme) */
-  .india-outline{fill:var(--land);stroke:var(--landline);stroke-width:1.5}
-  .route-base{fill:none;stroke:#d8d5cd;stroke-width:5;stroke-linecap:round}
-  .route-glow{fill:none;stroke:var(--rausch);stroke-width:5;stroke-linecap:round;filter:drop-shadow(0 1px 3px rgba(255,56,92,.45))}
-  .city-dot{fill:#fff;stroke:#9a9a9a;stroke-width:1.5;transition:all .4s}
-  .city-dot.lit{fill:var(--rausch);stroke:#fff;filter:drop-shadow(0 1px 4px rgba(255,56,92,.7))}
-  .city-label{font-size:13px;font-weight:700;fill:#8a8a8a;opacity:.75;transition:all .4s}
-  .city-label.lit{fill:var(--ink);opacity:1}
-  .pulse{fill:none;stroke:var(--rausch);stroke-width:2;opacity:0}
-  .car{filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-  .sea-label{font-size:12px;fill:#a8c3cc;font-style:italic;letter-spacing:.2em}
-
-  /* thumbnails reuse outline colors via classes above */
-  .thumb .route-mini{fill:none;stroke:var(--rausch);stroke-linecap:round}
+  /* leaflet map bits */
+  .leaflet-container{font-family:inherit}
+  .leaflet-control-attribution{font-size:10px}
+  .leaflet-tooltip.map-city-label{
+    background:transparent;border:none;box-shadow:none;padding:0 2px;
+    font-family:inherit;font-size:12px;font-weight:700;color:#6b6b6b;
+    text-shadow:0 1px 2px #fff,0 -1px 2px #fff,1px 0 2px #fff,-1px 0 2px #fff;
+    transition:color .3s;
+  }
+  .leaflet-tooltip.map-city-label::before{display:none}
+  .leaflet-tooltip.map-city-label.lit{color:var(--ink)}
+  .car-icon{width:46px;height:30px;transform-origin:50% 50%;will-change:transform}
+  .car-icon svg{display:block;overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  .pulse-ring{
+    display:block;width:36px;height:36px;border-radius:50%;
+    border:2px solid var(--rausch);opacity:0;
+    animation:mapPulse .9s ease-out forwards;
+  }
+  @keyframes mapPulse{
+    0%{transform:scale(.25);opacity:.9}
+    100%{transform:scale(1.6);opacity:0}
+  }
+  .thumb .thumbmap{width:100%;height:100%;pointer-events:none}
 
   /* ============ NOTE ============ */
   .post{
@@ -367,6 +380,7 @@
     .leg-tab{padding:8px 14px;font-size:12.5px}
     .hero{gap:18px}
     .map-wrap{flex-basis:100%}
+    #mainMap{height:380px}
     .bookcard{position:static;flex-basis:100%;min-width:0;padding:18px}
     .metric .big{font-size:26px}
     .facts-sec{margin-top:18px;padding-top:20px}
@@ -450,35 +464,7 @@
 
       <div class="hero">
         <div class="map-wrap">
-          <svg id="mainMap" viewBox="0 0 620 720" xmlns="http://www.w3.org/2000/svg" aria-label="Animated route map">
-            <path class="india-outline" d="
-              M232,28
-              C210,50 196,74 178,96 C158,120 132,138 118,166
-              C104,194 100,224 88,252 C78,276 62,296 66,322
-              C70,346 96,352 112,370 C134,396 148,430 164,462
-              C182,498 200,534 222,568 C240,596 256,628 278,650
-              C290,662 304,672 312,658 C322,640 316,614 322,594
-              C332,560 352,532 366,500 C382,464 396,428 408,392
-              C418,362 430,334 442,306 C452,282 466,260 470,234
-              C474,214 466,196 476,178 C488,158 512,150 530,138
-              C548,126 566,116 560,100 C554,84 530,88 512,84
-              C490,80 470,68 448,64 C420,58 392,60 364,54
-              C334,48 306,36 276,30 C262,27 246,26 232,28 Z"/>
-            <text class="sea-label" x="440" y="640">BAY  OF  BENGAL</text>
-            <text class="sea-label" x="142" y="600">ARABIAN  SEA</text>
-            <g id="routeLayer"></g>
-            <g id="cityLayer"></g>
-            <g id="car" class="car">
-              <g transform="translate(-16,-9)">
-                <rect x="2" y="4" width="28" height="10" rx="5" fill="#FF385C"/>
-                <path d="M8,4 L12,-1 L22,-1 L26,4 Z" fill="#E31C5F"/>
-                <rect x="13" y="0.5" width="7" height="3.5" rx="1" fill="#fff"/>
-                <circle cx="9" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
-                <circle cx="24" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
-                <circle cx="29" cy="7" r="1.6" fill="#fff8c4"/>
-              </g>
-            </g>
-          </svg>
+          <div id="mainMap" aria-label="Animated route map"></div>
         </div>
 
         <div class="bookcard">
@@ -574,117 +560,232 @@
 
 <footer>
   <div>© 2026 <b>saurabh.travels</b> · roads, paw love & food</div>
+  <div>Maps © <a href="https://www.openstreetmap.org/copyright" style="color:inherit">OpenStreetMap</a> contributors · © <a href="https://carto.com/attributions" style="color:inherit">CARTO</a></div>
   <div>Drivers' club · family 👨‍👩‍👧‍👦 ❤️</div>
 </footer>
 
 <script>
-  /* ================= ROUTE DATA ================= */
-  const INDIA_D = "M232,28 C210,50 196,74 178,96 C158,120 132,138 118,166 C104,194 100,224 88,252 C78,276 62,296 66,322 C70,346 96,352 112,370 C134,396 148,430 164,462 C182,498 200,534 222,568 C240,596 256,628 278,650 C290,662 304,672 312,658 C322,640 316,614 322,594 C332,560 352,532 366,500 C382,464 396,428 408,392 C418,362 430,334 442,306 C452,282 466,260 470,234 C474,214 466,196 476,178 C488,158 512,150 530,138 C548,126 566,116 560,100 C554,84 530,88 512,84 C490,80 470,68 448,64 C420,58 392,60 364,54 C334,48 306,36 276,30 C262,27 246,26 232,28 Z";
+  /* ================= ROUTE DATA =================
+     Real-world waypoints [lat, lng] drawn on an OpenStreetMap base.
+     First & last entries are the endpoints; the ones in between shape
+     the route roughly along the highways actually driven. */
 
-  const EAST_PATH = "M462,205 C456,240 450,268 446,300 C438,326 430,342 418,364 C406,390 398,408 388,428 C374,450 358,464 346,484 C336,510 324,534 316,556 C300,572 276,566 254,570";
+  const EAST_PATH = [                 /* Siliguri → Bengaluru · NH 16 coast road */
+    [26.71, 88.43],                   /* Siliguri */
+    [25.01, 88.14],                   /* Malda */
+    [23.25, 88.35],
+    [22.57, 88.36],                   /* Kolkata */
+    [22.35, 87.23],                   /* Kharagpur */
+    [21.66, 87.70],                   /* Mandarmani beach detour */
+    [21.49, 86.93],                   /* Balasore */
+    [20.30, 85.82],                   /* Bhubaneswar */
+    [19.31, 84.79],                   /* Brahmapur */
+    [18.30, 83.90],
+    [17.69, 83.22],                   /* Visakhapatnam */
+    [17.00, 81.80],                   /* Rajahmundry */
+    [16.51, 80.65],                   /* Vijayawada */
+    [15.50, 80.05],                   /* Ongole */
+    [14.44, 79.99],                   /* Nellore */
+    [13.08, 80.27],                   /* Chennai */
+    [12.92, 79.13],                   /* Vellore */
+    [12.97, 77.59]                    /* Bengaluru */
+  ];
   const EAST_CITIES = [
-    { name:"Siliguri",       x:462, y:205, anchor:"start", dx:12,  dy:-6  },
-    { name:"Kolkata",        x:446, y:300, anchor:"start", dx:12,  dy:4   },
-    { name:"Kharagpur",      x:438, y:326, anchor:"end",   dx:-10, dy:2   },
-    { name:"Mandarmani",     x:452, y:340, anchor:"start", dx:8,   dy:8   },
-    { name:"Bhubaneswar",    x:418, y:364, anchor:"end",   dx:-12, dy:4   },
-    { name:"Visakhapatnam",  x:388, y:428, anchor:"end",   dx:-12, dy:4   },
-    { name:"Vijayawada",     x:346, y:484, anchor:"end",   dx:-12, dy:4   },
-    { name:"Chennai",        x:316, y:556, anchor:"start", dx:12,  dy:12  },
-    { name:"Bengaluru",      x:254, y:570, anchor:"end",   dx:-12, dy:-8  }
+    { name:"Siliguri",      lat:26.71, lng:88.43, side:"right" },
+    { name:"Kolkata",       lat:22.57, lng:88.36, side:"right" },
+    { name:"Kharagpur",     lat:22.35, lng:87.23, side:"left"  },
+    { name:"Mandarmani",    lat:21.66, lng:87.70, side:"right" },
+    { name:"Bhubaneswar",   lat:20.30, lng:85.82, side:"left"  },
+    { name:"Visakhapatnam", lat:17.69, lng:83.22, side:"left"  },
+    { name:"Vijayawada",    lat:16.51, lng:80.65, side:"left"  },
+    { name:"Chennai",       lat:13.08, lng:80.27, side:"right" },
+    { name:"Bengaluru",     lat:12.97, lng:77.59, side:"left"  }
   ];
 
-  const NH44_PATH = "M254,570 C270,530 280,495 290,455 C298,428 300,398 300,370 C298,336 292,306 285,275 C280,244 272,214 268,185 C266,168 267,153 268,138";
+  const NH44_PATH = [                 /* Bengaluru → Chandigarh · straight up NH 44 */
+    [12.97, 77.59],                   /* Bengaluru */
+    [14.68, 77.60],                   /* Anantapur */
+    [15.83, 78.04],                   /* Kurnool */
+    [17.39, 78.49],                   /* Hyderabad */
+    [19.66, 78.53],                   /* Adilabad */
+    [21.15, 79.09],                   /* Nagpur */
+    [22.09, 79.54],                   /* Seoni */
+    [23.18, 79.99],                   /* Jabalpur */
+    [23.84, 78.74],                   /* Sagar */
+    [25.45, 78.57],                   /* Jhansi */
+    [26.22, 78.18],                   /* Gwalior */
+    [27.18, 78.01],                   /* Agra */
+    [28.61, 77.21],                   /* Delhi */
+    [29.39, 76.97],                   /* Panipat */
+    [30.38, 76.78],                   /* Ambala */
+    [30.73, 76.78]                    /* Chandigarh */
+  ];
   const NH44_CITIES = [
-    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 },
-    { name:"Hyderabad",  x:290, y:455, anchor:"start", dx:12,  dy:4  },
-    { name:"Nagpur",     x:300, y:370, anchor:"start", dx:12,  dy:4  },
-    { name:"Jabalpur",   x:295, y:322, anchor:"start", dx:12,  dy:4  },
-    { name:"Jhansi",     x:285, y:275, anchor:"start", dx:12,  dy:4  },
-    { name:"Delhi",      x:268, y:185, anchor:"start", dx:12,  dy:4  },
-    { name:"Chandigarh", x:268, y:138, anchor:"start", dx:12,  dy:-4 }
+    { name:"Bengaluru",  lat:12.97, lng:77.59, side:"left"  },
+    { name:"Hyderabad",  lat:17.39, lng:78.49, side:"right" },
+    { name:"Nagpur",     lat:21.15, lng:79.09, side:"right" },
+    { name:"Jabalpur",   lat:23.18, lng:79.99, side:"right" },
+    { name:"Jhansi",     lat:25.45, lng:78.57, side:"right" },
+    { name:"Delhi",      lat:28.61, lng:77.21, side:"right" },
+    { name:"Chandigarh", lat:30.73, lng:76.78, side:"right" }
   ];
 
-  const RETURN_PATH = "M268,138 C280,140 292,146 300,152 C296,166 282,178 268,190 C255,205 240,222 230,238 C226,255 226,271 228,288 C232,310 236,330 240,352 C230,390 212,428 200,465 C206,502 232,540 254,570";
+  const RETURN_PATH = [               /* Chandigarh → Bengaluru · the scenic way home */
+    [30.73, 76.78],                   /* Chandigarh */
+    [30.09, 78.27],                   /* Rishikesh */
+    [29.87, 77.89],                   /* Roorkee */
+    [28.98, 77.70],                   /* Meerut */
+    [28.46, 77.03],                   /* Gurugram */
+    [26.91, 75.79],                   /* Jaipur */
+    [25.21, 75.86],                   /* Kota */
+    [23.18, 75.78],                   /* Ujjain */
+    [22.72, 75.86],                   /* Indore */
+    [21.35, 75.30],                   /* Sendhwa */
+    [20.90, 74.77],                   /* Dhule */
+    [20.03, 75.18],                   /* Ellora Caves */
+    [19.88, 75.34],                   /* Aurangabad */
+    [19.09, 74.74],                   /* Ahmednagar */
+    [18.52, 73.86],                   /* Pune */
+    [17.68, 73.99],                   /* Satara */
+    [16.70, 74.24],                   /* Kolhapur */
+    [15.85, 74.50],                   /* Belagavi */
+    [15.36, 75.12],                   /* Hubballi */
+    [14.23, 76.40],                   /* Chitradurga */
+    [12.97, 77.59]                    /* Bengaluru */
+  ];
   const RETURN_CITIES = [
-    { name:"Chandigarh", x:268, y:138, anchor:"start", dx:12,  dy:-4 },
-    { name:"Rishikesh",  x:300, y:152, anchor:"start", dx:10,  dy:12 },
-    { name:"Jaipur",     x:230, y:238, anchor:"end",   dx:-12, dy:4  },
-    { name:"Kota",       x:228, y:288, anchor:"end",   dx:-12, dy:4  },
-    { name:"Indore",     x:240, y:352, anchor:"end",   dx:-12, dy:4  },
-    { name:"Ellora Caves", x:222, y:408, anchor:"end", dx:-12, dy:4  },
-    { name:"Pune",       x:200, y:465, anchor:"end",   dx:-12, dy:4  },
-    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 }
+    { name:"Chandigarh",   lat:30.73, lng:76.78, side:"right" },
+    { name:"Rishikesh",    lat:30.09, lng:78.27, side:"right" },
+    { name:"Jaipur",       lat:26.91, lng:75.79, side:"left"  },
+    { name:"Kota",         lat:25.21, lng:75.86, side:"left"  },
+    { name:"Indore",       lat:22.72, lng:75.86, side:"left"  },
+    { name:"Ellora Caves", lat:20.03, lng:75.18, side:"left"  },
+    { name:"Pune",         lat:18.52, lng:73.86, side:"left"  },
+    { name:"Bengaluru",    lat:12.97, lng:77.59, side:"left"  }
   ];
 
-  const GOA_DOWN_PATH = "M254,570 C240,555 228,540 215,525 C202,518 188,512 178,505 C174,499 172,493 172,488 C171,484 170,480 170,477";
+  const GOA_DOWN_PATH = [             /* Bengaluru → Agonda · NH 48 & NH 69 */
+    [12.97, 77.59],                   /* Bengaluru */
+    [13.34, 77.10],                   /* Tumakuru */
+    [13.93, 75.57],                   /* Shivamogga */
+    [14.16, 75.03],                   /* Sagara */
+    [14.28, 74.44],                   /* Honnavar */
+    [14.81, 74.13],                   /* Karwar */
+    [15.04, 73.99]                    /* Agonda */
+  ];
   const GOA_DOWN_CITIES = [
-    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-12, dy:-8 },
-    { name:"Shivamogga", x:215, y:525, anchor:"start", dx:10,  dy:10 },
-    { name:"Honnavar",   x:178, y:505, anchor:"start", dx:10,  dy:8  },
-    { name:"Karwar",     x:172, y:488, anchor:"start", dx:10,  dy:4  },
-    { name:"Agonda",     x:170, y:477, anchor:"start", dx:10,  dy:-4 }
+    { name:"Bengaluru",  lat:12.97, lng:77.59, side:"left"  },
+    { name:"Shivamogga", lat:13.93, lng:75.57, side:"right" },
+    { name:"Honnavar",   lat:14.28, lng:74.44, side:"right" },
+    { name:"Karwar",     lat:14.81, lng:74.13, side:"right" },
+    { name:"Agonda",     lat:15.04, lng:73.99, side:"right" }
   ];
-  const GOA_HOP_PATH = "M170,477 C169,474 168,472 168,470 C167,467 166,465 165,462 C164,460 163,457 163,455";
+  const GOA_HOP_PATH = [              /* Agonda → Vagator · the coast in a morning */
+    [15.04, 73.99],                   /* Agonda */
+    [15.27, 73.96],                   /* Madgaon */
+    [15.50, 73.83],                   /* Panaji */
+    [15.60, 73.74]                    /* Vagator */
+  ];
   const GOA_HOP_CITIES = [
-    { name:"Agonda",  x:170, y:477, anchor:"start", dx:8, dy:4  },
-    { name:"Madgaon", x:168, y:470, anchor:"start", dx:8, dy:2  },
-    { name:"Panaji",  x:165, y:462, anchor:"start", dx:8, dy:2  },
-    { name:"Vagator", x:163, y:455, anchor:"start", dx:8, dy:-2 }
+    { name:"Agonda",  lat:15.04, lng:73.99, side:"right" },
+    { name:"Madgaon", lat:15.27, lng:73.96, side:"right" },
+    { name:"Panaji",  lat:15.50, lng:73.83, side:"right" },
+    { name:"Vagator", lat:15.60, lng:73.74, side:"right" }
   ];
-  const GOA_UP_PATH = "M163,455 C172,447 186,440 198,437 C204,443 208,449 212,455 C220,475 226,495 232,522 C238,538 246,555 254,570";
+  const GOA_UP_PATH = [               /* Vagator → Bengaluru · NH 48 */
+    [15.60, 73.74],                   /* Vagator */
+    [15.85, 74.50],                   /* Belagavi */
+    [15.46, 75.01],                   /* Dharwad */
+    [15.36, 75.12],                   /* Hubballi */
+    [14.23, 76.40],                   /* Chitradurga */
+    [13.68, 76.85],                   /* Sira */
+    [12.97, 77.59]                    /* Bengaluru */
+  ];
   const GOA_UP_CITIES = [
-    { name:"Vagator",     x:163, y:455, anchor:"start", dx:8,   dy:-6 },
-    { name:"Belagavi",    x:198, y:437, anchor:"start", dx:8,   dy:-4 },
-    { name:"Dharwad",     x:212, y:455, anchor:"start", dx:10,  dy:4  },
-    { name:"Chitradurga", x:232, y:522, anchor:"start", dx:10,  dy:4  },
-    { name:"Bengaluru",   x:254, y:570, anchor:"end",   dx:-12, dy:-8 }
+    { name:"Vagator",     lat:15.60, lng:73.74, side:"right" },
+    { name:"Belagavi",    lat:15.85, lng:74.50, side:"right" },
+    { name:"Dharwad",     lat:15.46, lng:75.01, side:"right" },
+    { name:"Chitradurga", lat:14.23, lng:76.40, side:"right" },
+    { name:"Bengaluru",   lat:12.97, lng:77.59, side:"left"  }
   ];
 
   /* Bengaluru → Chikkamagaluru via Hassan & Belur */
-  const CHIK_PATH = "M254,570 C245,566 236,562 228,558 C224,555 219,552 215,550 C213,548 210,545 208,543";
+  const CHIK_PATH = [
+    [12.97, 77.59],                   /* Bengaluru */
+    [13.10, 77.39],                   /* Nelamangala */
+    [13.02, 77.03],                   /* Kunigal */
+    [12.90, 76.39],                   /* Channarayapatna */
+    [13.01, 76.10],                   /* Hassan */
+    [13.16, 75.86],                   /* Belur */
+    [13.32, 75.77]                    /* Chikkamagaluru */
+  ];
   const CHIK_CITIES = [
-    { name:"Bengaluru",      x:254, y:570, anchor:"start", dx:6,  dy:12  },
-    { name:"Hassan",         x:228, y:558, anchor:"start", dx:3,  dy:13  },
-    { name:"Belur",          x:215, y:550, anchor:"start", dx:2,  dy:-9  },
-    { name:"Chikkamagaluru", x:208, y:543, anchor:"end",   dx:-8, dy:-4  }
+    { name:"Bengaluru",      lat:12.97, lng:77.59, side:"right" },
+    { name:"Hassan",         lat:13.01, lng:76.10, side:"right" },
+    { name:"Belur",          lat:13.16, lng:75.86, side:"right" },
+    { name:"Chikkamagaluru", lat:13.32, lng:75.77, side:"left"  }
   ];
 
   /* Bengaluru → Hyderabad on NH 44 (first stretch of the great spine) */
-  const HYD_PATH = "M254,570 C270,530 280,495 290,455";
+  const HYD_PATH = [
+    [12.97, 77.59],                   /* Bengaluru */
+    [13.43, 77.73],                   /* Chikkaballapur */
+    [14.68, 77.60],                   /* Anantapur */
+    [15.83, 78.04],                   /* Kurnool */
+    [16.77, 78.14],                   /* Jadcherla */
+    [17.39, 78.49]                    /* Hyderabad */
+  ];
   const HYD_CITIES = [
-    { name:"Bengaluru", x:254, y:570, anchor:"end",   dx:-10, dy:-6 },
-    { name:"Anantapur", x:274, y:512, anchor:"start", dx:8,   dy:4  },
-    { name:"Kurnool",   x:282, y:484, anchor:"start", dx:8,   dy:4  },
-    { name:"Hyderabad", x:290, y:455, anchor:"start", dx:8,   dy:-4 }
+    { name:"Bengaluru", lat:12.97, lng:77.59, side:"left"  },
+    { name:"Anantapur", lat:14.68, lng:77.60, side:"right" },
+    { name:"Kurnool",   lat:15.83, lng:78.04, side:"right" },
+    { name:"Hyderabad", lat:17.39, lng:78.49, side:"right" }
   ];
 
   /* Bengaluru → Varkala down through Kerala (NH 544 / NH 66) */
-  const VARKALA_PATH = "M254,570 C260,577 266,583 270,590 C264,595 255,600 250,606 C252,615 255,624 258,632 C263,637 269,642 274,646 C276,648 278,650 280,652";
+  const VARKALA_PATH = [
+    [12.97, 77.59],                   /* Bengaluru */
+    [12.74, 77.83],                   /* Hosur */
+    [12.13, 78.16],                   /* Dharmapuri */
+    [11.66, 78.15],                   /* Salem */
+    [11.19, 77.27],                   /* Avinashi */
+    [11.02, 76.96],                   /* Coimbatore */
+    [10.79, 76.65],                   /* Palakkad */
+    [10.53, 76.21],                   /* Thrissur */
+    [9.93,  76.27],                   /* Kochi */
+    [9.50,  76.34],                   /* Alappuzha */
+    [8.89,  76.61],                   /* Kollam */
+    [8.73,  76.72]                    /* Varkala */
+  ];
   const VARKALA_CITIES = [
-    { name:"Bengaluru",  x:254, y:570, anchor:"end",   dx:-10, dy:-6 },
-    { name:"Salem",      x:270, y:590, anchor:"start", dx:8,   dy:4  },
-    { name:"Coimbatore", x:250, y:606, anchor:"end",   dx:-8,  dy:4  },
-    { name:"Kochi",      x:258, y:632, anchor:"end",   dx:-8,  dy:4  },
-    { name:"Varkala",    x:280, y:652, anchor:"start", dx:8,   dy:6  }
+    { name:"Bengaluru",  lat:12.97, lng:77.59, side:"left"  },
+    { name:"Salem",      lat:11.66, lng:78.15, side:"right" },
+    { name:"Coimbatore", lat:11.02, lng:76.96, side:"left"  },
+    { name:"Kochi",      lat:9.93,  lng:76.27, side:"left"  },
+    { name:"Varkala",    lat:8.73,  lng:76.72, side:"right" }
   ];
 
   /* Bengaluru → Pondicherry via Krishnagiri & Tiruvannamalai */
-  const PONDY_PATH = "M254,570 C260,574 266,577 272,580 C280,583 288,584 295,586 C304,588 314,590 322,592";
+  const PONDY_PATH = [
+    [12.97, 77.59],                   /* Bengaluru */
+    [12.74, 77.83],                   /* Hosur */
+    [12.52, 78.21],                   /* Krishnagiri */
+    [12.23, 79.07],                   /* Tiruvannamalai */
+    [12.25, 79.42],                   /* Gingee */
+    [11.94, 79.81]                    /* Pondicherry */
+  ];
   const PONDY_CITIES = [
-    { name:"Bengaluru",     x:254, y:570, anchor:"end",   dx:-10, dy:-8 },
-    { name:"Krishnagiri",   x:272, y:580, anchor:"start", dx:4,   dy:14 },
-    { name:"Tiruvannamalai",x:295, y:586, anchor:"start", dx:2,   dy:-10},
-    { name:"Pondicherry",   x:322, y:592, anchor:"start", dx:8,   dy:6  }
+    { name:"Bengaluru",      lat:12.97, lng:77.59, side:"left"  },
+    { name:"Krishnagiri",    lat:12.52, lng:78.21, side:"right" },
+    { name:"Tiruvannamalai", lat:12.23, lng:79.07, side:"right" },
+    { name:"Pondicherry",    lat:11.94, lng:79.81, side:"right" }
   ];
 
-  const FULL_VIEW  = { x:0, y:0, w:620, h:720 };
-  const GOA_VIEW   = { x:135, y:425, w:170, h:198 };
-  const HOP_VIEW   = { x:138, y:436, w:60,  h:70  };
-  const PONDY_VIEW = { x:228, y:522, w:120, h:140 };
-  const CHIK_VIEW  = { x:190, y:518, w:82,  h:95  };
-  const HYD_VIEW   = { x:222, y:438, w:125, h:145 };
-  const VARKALA_VIEW = { x:225, y:550, w:105, h:122 };
+  /* The old hand-drawn SVG viewboxes are gone — the map now fits itself to
+     the route's real bounds. Kept as nulls so the trip data below (which
+     still references them) needs no changes. */
+  const FULL_VIEW = null, GOA_VIEW = null, HOP_VIEW = null, PONDY_VIEW = null,
+        CHIK_VIEW = null, HYD_VIEW = null, VARKALA_VIEW = null;
 
   /* ================= TRIPS ================= */
   const TRIPS = {
@@ -1024,20 +1125,51 @@
   Object.keys(TRIPS).forEach(id=>{ SLUG_TO_ID[slugify(TRIPS[id].name)] = id; });
   const tripSlug = id => slugify(TRIPS[id].name);
 
-  const DURATION = 5000;
-  const NS = "http://www.w3.org/2000/svg";
+  /* ================= SHARED MAP HELPERS ================= */
+  function addTiles(m){
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      subdomains:"abcd", maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(m);
+  }
+
+  /* Catmull-Rom spline through the waypoints → smooth dense polyline */
+  function densify(wps, per = 24){
+    if(wps.length < 2) return wps.slice();
+    const P = i => wps[Math.max(0, Math.min(wps.length - 1, i))];
+    const out = [];
+    for(let i = 0; i < wps.length - 1; i++){
+      const p0 = P(i-1), p1 = P(i), p2 = P(i+1), p3 = P(i+2);
+      for(let j = 0; j < per; j++){
+        const t = j/per, t2 = t*t, t3 = t2*t;
+        out.push([
+          .5*(2*p1[0] + (p2[0]-p0[0])*t + (2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2 + (3*p1[0]-p0[0]-3*p2[0]+p3[0])*t3),
+          .5*(2*p1[1] + (p2[1]-p0[1])*t + (2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2 + (3*p1[1]-p0[1]-3*p2[1]+p3[1])*t3)
+        ]);
+      }
+    }
+    out.push([P(wps.length-1)[0], P(wps.length-1)[1]]);
+    return out;
+  }
 
   /* ================= HOME CARDS ================= */
-  function thumbSVG(trip){
-    const v = trip.thumbView;
-    const s = 620 / v.w;
-    const paths = trip.thumbPaths.map(d=>
-      `<path class="route-mini" d="${d}" stroke-width="${4/s}"/>`
-    ).join("");
-    return `<svg viewBox="${v.x} ${v.y} ${v.w} ${v.h}" xmlns="${NS}" preserveAspectRatio="xMidYMid slice">
-      <path class="india-outline" d="${INDIA_D}" style="stroke-width:${1.5/s}"/>
-      ${paths}
-    </svg>`;
+  let thumbMaps = [];
+  function makeThumbMap(el, trip){
+    const m = L.map(el, {
+      zoomControl:false, attributionControl:false, zoomSnap:.1,
+      dragging:false, scrollWheelZoom:false, doubleClickZoom:false,
+      boxZoom:false, keyboard:false, touchZoom:false
+    });
+    addTiles(m);
+    let bounds = null;
+    trip.thumbPaths.forEach(wps=>{
+      const pts = densify(wps);
+      L.polyline(pts, { color:"#FF385C", weight:3, opacity:.95, lineCap:"round" }).addTo(m);
+      const b = L.latLngBounds(pts);
+      bounds = bounds ? bounds.extend(b) : b;
+    });
+    m.fitBounds(bounds.pad(.25));
+    return m;
   }
 
   /* ---- search state: city / year / person ---- */
@@ -1113,6 +1245,8 @@
 
   function buildHome(){
     const grid = document.getElementById("cardGrid");
+    thumbMaps.forEach(m=> m.remove());
+    thumbMaps = [];
     grid.innerHTML = "";
     const ids = TRIP_ORDER
       .filter(id=>{
@@ -1131,7 +1265,7 @@
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <div class="thumb">${thumbSVG(t)}
+        <div class="thumb"><div class="thumbmap"></div>
           <span class="badge">${t.badge}</span>
         </div>
         <button class="heart">♥</button>
@@ -1144,80 +1278,115 @@
       card.querySelector(".heart").onclick = (e)=>{ e.stopPropagation(); e.target.classList.toggle("saved"); };
       card.onclick = ()=> openTrip(id);
       grid.appendChild(card);
+      thumbMaps.push(makeThumbMap(card.querySelector(".thumbmap"), t));
     });
   }
 
-  /* ================= MAP ENGINE ================= */
-  const routeLayer = document.getElementById("routeLayer");
-  const car = document.getElementById("car");
+  /* ================= MAP ENGINE (Leaflet) ================= */
   const kmEl = document.getElementById("km");
   const hrsEl = document.getElementById("hrs");
-  const cityLayer = document.getElementById("cityLayer");
   const chipsEl = document.getElementById("chips");
 
   let curTrip = "t1", curLeg = -1, raf, state = null; /* curLeg -1 = full trip */
+  let map = null, carMarker = null, carEl = null, routeLayers = [];
 
-  function computeCityTs(pathEl, cities){
-    const L = pathEl.getTotalLength();
-    const N = 400;
-    const pts = [];
-    for(let i=0;i<=N;i++) pts.push(pathEl.getPointAtLength(L*i/N));
-    return cities.map(c=>{
-      let best = 0, bestD = Infinity;
-      pts.forEach((p,i)=>{
-        const d = (p.x-c.x)**2 + (p.y-c.y)**2;
-        if(d < bestD){ bestD = d; best = i; }
-      });
-      return best/N;
-    });
+  const CAR_HTML = `<svg width="46" height="30" viewBox="0 0 46 30">
+    <g transform="translate(7,7)">
+      <rect x="2" y="4" width="28" height="10" rx="5" fill="#FF385C"/>
+      <path d="M8,4 L12,-1 L22,-1 L26,4 Z" fill="#E31C5F"/>
+      <rect x="13" y="0.5" width="7" height="3.5" rx="1" fill="#fff"/>
+      <circle cx="9" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
+      <circle cx="24" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
+      <circle cx="29" cy="7" r="1.6" fill="#fff8c4"/>
+    </g></svg>`;
+
+  function ensureMap(){
+    if(map) return;
+    map = L.map("mainMap", { zoomSnap:.25, scrollWheelZoom:false });
+    addTiles(map);
   }
 
-  function pulseCity(i){
-    const p = document.getElementById("pulse"+i);
-    const s = state ? state.scale : 1;
-    const start = performance.now();
-    (function grow(now){
-      const k = Math.min((now-start)/900, 1);
-      p.setAttribute("r", (6 + 20*k)/s);
-      p.style.opacity = 0.9*(1-k);
-      if(k<1) requestAnimationFrame(grow);
-    })(start);
+  /* dense points + cumulative distances + where along the line each city sits */
+  function buildSegGeom(seg){
+    let pts = densify(seg.path);
+    if(seg.reverse) pts = pts.slice().reverse();
+    const cum = [0];
+    for(let i = 1; i < pts.length; i++)
+      cum.push(cum[i-1] + map.distance(pts[i-1], pts[i]));
+    const total = cum[cum.length-1] || 1;
+    const cityTs = seg.cities.map(c=>{
+      let best = 0, bd = Infinity;
+      pts.forEach((p,i)=>{
+        const d = (p[0]-c.lat)**2 + (p[1]-c.lng)**2;
+        if(d < bd){ bd = d; best = i; }
+      });
+      return cum[best]/total;
+    });
+    return { pts, cum, total, cityTs };
+  }
+
+  function pointAlong(st, dist){
+    const { pts, cum } = st;
+    let lo = 0, hi = pts.length - 1;
+    while(lo < hi){                       /* first index with cum >= dist */
+      const mid = (lo + hi) >> 1;
+      if(cum[mid] < dist) lo = mid + 1; else hi = mid;
+    }
+    const i = Math.max(1, lo);
+    const span = cum[i] - cum[i-1] || 1;
+    const f = Math.min(1, Math.max(0, (dist - cum[i-1]) / span));
+    return {
+      idx: i - 1,
+      lat: pts[i-1][0] + (pts[i][0]-pts[i-1][0])*f,
+      lng: pts[i-1][1] + (pts[i][1]-pts[i-1][1])*f
+    };
+  }
+
+  function bearingAt(st, dist){
+    const a = pointAlong(st, Math.max(0, dist - st.total*.004));
+    const b = pointAlong(st, Math.min(st.total, dist + st.total*.004));
+    const pa = map.latLngToLayerPoint([a.lat, a.lng]);
+    const pb = map.latLngToLayerPoint([b.lat, b.lng]);
+    return Math.atan2(pb.y - pa.y, pb.x - pa.x) * 180/Math.PI;
+  }
+
+  function pulseCity(c){
+    const ring = L.marker([c.lat, c.lng], {
+      interactive:false,
+      icon: L.divIcon({ className:"", html:'<span class="pulse-ring"></span>', iconSize:[36,36], iconAnchor:[18,18] })
+    }).addTo(map);
+    setTimeout(()=>{ map.removeLayer(ring); }, 950);
+  }
+
+  function setDotLit(i, on){
+    const d = state.dots[i];
+    d.setStyle(on ? { fillColor:"#FF385C", color:"#fff" } : { fillColor:"#fff", color:"#9a9a9a" });
+    const tt = d.getTooltip() && d.getTooltip().getElement();
+    if(tt) tt.classList.toggle("lit", on);
   }
 
   const easeInOut = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
 
   function mount(){
+    ensureMap();
+    map.invalidateSize();
+    routeLayers.forEach(l=> map.removeLayer(l));
+    routeLayers = [];
+
     const trip = TRIPS[curTrip];
     const full = curLeg === -1;
     const segments = full ? trip.legs : [trip.legs[curLeg]];
-    const view = full ? (trip.view || FULL_VIEW) : (trip.legs[curLeg].view || FULL_VIEW);
-    const s = 620 / view.w;
-    const svgEl = document.getElementById("mainMap");
-    svgEl.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
-    svgEl.querySelector(".india-outline").style.strokeWidth = 1.5/s;
-    svgEl.querySelectorAll(".sea-label").forEach(t=> t.style.fontSize = (12/s)+"px");
 
-    /* build route paths: all base roads first, then all glows on top */
-    routeLayer.innerHTML = "";
-    const segStates = segments.map(seg=>{
-      const base = document.createElementNS(NS,"path");
-      base.setAttribute("class","route-base");
-      base.setAttribute("d", seg.path);
-      base.style.strokeWidth = 5/s;
-      routeLayer.appendChild(base);
-      return { seg };
+    const segStates = segments.map(seg=> Object.assign({ seg }, buildSegGeom(seg)));
+
+    /* all base roads first, then the animated red lines on top */
+    segStates.forEach(st=>{
+      st.base = L.polyline(st.pts, { color:"#b9b4a9", weight:5, opacity:.75, lineCap:"round" }).addTo(map);
+      routeLayers.push(st.base);
     });
     segStates.forEach(st=>{
-      const glow = document.createElementNS(NS,"path");
-      glow.setAttribute("class","route-glow");
-      glow.setAttribute("d", st.seg.path);
-      glow.style.strokeWidth = 5/s;
-      routeLayer.appendChild(glow);
-      const len = glow.getTotalLength();
-      glow.style.strokeDasharray = len;
-      glow.style.strokeDashoffset = st.seg.reverse ? -len : len;
-      st.glow = glow; st.len = len;
-      st.cityTs = computeCityTs(glow, st.seg.cities);
+      st.glow = L.polyline([], { color:"#FF385C", weight:5, lineCap:"round" }).addTo(map);
+      routeLayers.push(st.glow);
     });
 
     /* union of cities across segments, in travel order */
@@ -1229,24 +1398,17 @@
       });
     });
 
-    cityLayer.innerHTML = "";
-    union.forEach((c,i)=>{
-      const pulse = document.createElementNS(NS,"circle");
-      pulse.setAttribute("class","pulse"); pulse.setAttribute("cx",c.x); pulse.setAttribute("cy",c.y); pulse.setAttribute("r",6/s);
-      pulse.style.strokeWidth = 2/s;
-      pulse.id = "pulse"+i;
-      const dot = document.createElementNS(NS,"circle");
-      dot.setAttribute("class","city-dot"); dot.setAttribute("cx",c.x); dot.setAttribute("cy",c.y); dot.setAttribute("r",6/s);
-      dot.style.strokeWidth = 1.5/s;
-      dot.id = "dot"+i;
-      const label = document.createElementNS(NS,"text");
-      label.setAttribute("class","city-label");
-      label.setAttribute("x", c.x + c.dx/s); label.setAttribute("y", c.y + c.dy/s);
-      label.setAttribute("text-anchor", c.anchor);
-      label.style.fontSize = (13/s)+"px";
-      label.textContent = c.name;
-      label.id = "label"+i;
-      cityLayer.append(pulse, dot, label);
+    const dots = union.map(c=>{
+      const dot = L.circleMarker([c.lat, c.lng], {
+        radius:5.5, color:"#9a9a9a", weight:1.5, fillColor:"#fff", fillOpacity:1
+      }).addTo(map);
+      dot.bindTooltip(c.name, {
+        permanent:true, direction:c.side || "right",
+        offset:[c.side === "left" ? -9 : 9, 0],
+        className:"map-city-label", opacity:1
+      });
+      routeLayers.push(dot);
+      return dot;
     });
 
     chipsEl.innerHTML = "";
@@ -1266,30 +1428,40 @@
     }
     document.getElementById("replayBtn").textContent = full ? "Replay the whole trip" : "Replay this leg";
 
+    let bounds = null;
+    segStates.forEach(st=>{
+      const b = L.latLngBounds(st.pts);
+      bounds = bounds ? bounds.extend(b) : b;
+    });
+    map.fitBounds(bounds.pad(.14));
+
     state = {
-      segStates, idxByName, union, scale: s, full,
+      segStates, idxByName, union, dots, full,
       totalHrs: segments.reduce((a,l)=>a+l.hrs,0)
     };
 
     /* park the car at the start */
-    const first = segStates[0];
-    const pt0 = first.glow.getPointAtLength(first.seg.reverse ? first.len : 0);
-    car.setAttribute("transform", `translate(${pt0.x},${pt0.y}) scale(${1/s})`);
+    const start = segStates[0].pts[0];
+    if(!carMarker){
+      carMarker = L.marker(start, {
+        interactive:false, zIndexOffset:1000,
+        icon: L.divIcon({ className:"", html:`<div class="car-icon">${CAR_HTML}</div>`, iconSize:[46,30], iconAnchor:[23,15] })
+      }).addTo(map);
+    } else {
+      carMarker.setLatLng(start);
+    }
+    carEl = carMarker.getElement().querySelector(".car-icon");
+    carEl.style.transform = "";
   }
 
   function run(){
     if(!state) return;
     cancelAnimationFrame(raf);
-    const { segStates, idxByName, union, scale, totalHrs } = state;
+    const { segStates, idxByName, union, totalHrs } = state;
 
     /* reset */
-    segStates.forEach(st=>{
-      st.glow.style.strokeDashoffset = st.seg.reverse ? -st.len : st.len;
-    });
-    union.forEach((_,i)=>{
-      document.getElementById("dot"+i).classList.remove("lit");
-      document.getElementById("label"+i).classList.remove("lit");
-    });
+    segStates.forEach(st=> st.glow.setLatLngs([]));
+    union.forEach((_,i)=> setDotLit(i, false));
     document.querySelectorAll(".chip").forEach(ch=>ch.classList.remove("lit"));
     const lit = new Array(union.length).fill(false);
 
@@ -1298,38 +1470,32 @@
 
     function runSeg(){
       const st = segStates[k];
-      const seg = st.seg, len = st.len, rev = !!seg.reverse;
+      const seg = st.seg;
       const t0 = performance.now();
 
       function frame(now){
         const raw = Math.min((now-t0)/segDur, 1);
         const p = easeInOut(raw);
-        const pos = rev ? (1-p) : p;
+        const dist = st.total * p;
 
-        st.glow.style.strokeDashoffset = rev ? -len*(1-p) : len*(1-p);
-
-        const pt = st.glow.getPointAtLength(len * pos);
-        const step = rev ? -2 : 2;
-        const aheadLen = Math.max(0, Math.min(len*pos + step, len));
-        const ahead = st.glow.getPointAtLength(aheadLen);
-        const angle = Math.atan2(ahead.y-pt.y, ahead.x-pt.x) * 180/Math.PI;
-        car.setAttribute("transform", `translate(${pt.x},${pt.y}) rotate(${angle}) scale(${1/scale})`);
+        const pos = pointAlong(st, dist);
+        st.glow.setLatLngs(st.pts.slice(0, pos.idx + 1).concat([[pos.lat, pos.lng]]));
+        carMarker.setLatLng([pos.lat, pos.lng]);
+        carEl.style.transform = `rotate(${bearingAt(st, dist)}deg)`;
 
         kmEl.textContent = Math.round(kmBase + seg.km * p).toLocaleString("en-IN");
         const h = hrsBase + seg.hrs * p;
         hrsEl.textContent = totalHrs < 10 ? (Math.round(h*10)/10) : Math.round(h);
 
         seg.cities.forEach((c,i)=>{
-          const reach = rev ? (1 - st.cityTs[i]) : st.cityTs[i];
-          if(p >= reach - 0.005){
+          if(p >= st.cityTs[i] - 0.005){
             const ui = idxByName[c.name];
             if(!lit[ui]){
               lit[ui] = true;
-              document.getElementById("dot"+ui).classList.add("lit");
-              document.getElementById("label"+ui).classList.add("lit");
+              setDotLit(ui, true);
               const chip = document.querySelector(`.chip[data-city="${c.name}"]`);
               if(chip) chip.classList.add("lit");
-              pulseCity(ui);
+              pulseCity(c);
             }
           }
         });
@@ -1337,7 +1503,7 @@
         if(raw < 1){
           raf = requestAnimationFrame(frame);
         } else {
-          st.glow.style.strokeDashoffset = 0;
+          st.glow.setLatLngs(st.pts);
           kmBase += seg.km; hrsBase += seg.hrs;
           k++;
           if(k < segStates.length) runSeg();
