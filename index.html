@@ -171,14 +171,6 @@
     transition:transform .25s;
   }
   .card:hover .thumb{transform:scale(1.015)}
-  .card .heart{
-    position:absolute;top:12px;right:12px;font-size:22px;
-    color:rgba(0,0,0,.45);-webkit-text-stroke:2px #fff;
-    background:none;border:none;line-height:1;
-    transition:transform .15s;z-index:1;
-  }
-  .card .heart:hover{transform:scale(1.15)}
-  .card .heart.saved{color:var(--rausch)}
   .card .badge{
     position:absolute;top:12px;left:12px;background:#fff;
     border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;
@@ -1272,14 +1264,12 @@
         <div class="thumb"><div class="thumbmap"></div>
           <span class="badge">${t.badge}</span>
         </div>
-        <button class="heart">♥</button>
         <div class="meta">
           <div class="row1"><b>${t.name}</b></div>
           <div class="gray">${t.where}</div>
           <div class="gray">${t.when}</div>
           <div class="kms"><b>${t.totalLabel}</b></div>
         </div>`;
-      card.querySelector(".heart").onclick = (e)=>{ e.stopPropagation(); e.target.classList.toggle("saved"); };
       card.onclick = ()=> openTrip(id);
       grid.appendChild(card);
       thumbMaps.push(makeThumbMap(card.querySelector(".thumbmap"), t));
