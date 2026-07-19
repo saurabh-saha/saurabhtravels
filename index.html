@@ -121,7 +121,7 @@
 
   .home-head{padding:34px 0 6px}
   .home-head h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
-  .home-head p{color:var(--gray);font-size:15px;margin-top:4px}
+  .home-head p{color:var(--gray);font-size:15px;margin-top:4px;font-variant-numeric:tabular-nums}
 
   /* search dropdown panels */
   .searchpill .seg{background:none;border:none;color:inherit}
@@ -446,8 +446,8 @@
   <section class="page on" id="page-home">
     <div class="wrap">
       <div class="home-head">
-        <h1>Past drives</h1>
-        <p>Nine trips and counting — a wife, two dogs, parents, a friend, a brother, one hatchback.</p>
+        <h1>The drives</h1>
+        <p id="homeSubline"></p>
       </div>
       <div class="grid" id="cardGrid"></div>
     </div>
@@ -1097,15 +1097,15 @@
 
   /* date + crew metadata for sorting & filtering */
   const TRIP_META = {
-    t1: { sort:"2025-02", years:[2025],      people:["Wife","Cooper"] },
-    t2: { sort:"2024-12", years:[2024,2025], people:["Wife","Cooper","Hrithik","Manasa"] },
-    t3: { sort:"2024-08", years:[2024],      people:["Wife","Cooper"] },
-    t4: { sort:"2025-08", years:[2025],      people:["Aryan"] },
-    t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"] },
-    t6: { sort:"2025-10", years:[2025],      people:["Hrithik"] },
-    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"] },
-    t8: { sort:"2024-09", years:[2024],      people:["Wife","Cooper"] },
-    t9: { sort:"2025-05", years:[2025],      people:["Wife","Cooper","Hrithik"] }
+    t1: { sort:"2025-02", years:[2025],      people:["Wife","Cooper"],                   km:4912 },
+    t2: { sort:"2024-12", years:[2024,2025], people:["Wife","Cooper","Hrithik","Manasa"], km:5112 },
+    t3: { sort:"2024-08", years:[2024],      people:["Wife","Cooper"],                   km:1322 },
+    t4: { sort:"2025-08", years:[2025],      people:["Aryan"],                           km:640  },
+    t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"],          km:490  },
+    t6: { sort:"2025-10", years:[2025],      people:["Hrithik"],                         km:1140 },
+    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"],                   km:1510 },
+    t8: { sort:"2024-09", years:[2024],      people:["Wife","Cooper"],                   km:640  },
+    t9: { sort:"2025-05", years:[2025],      people:["Wife","Cooper","Hrithik"],          km:1140 }
   };
   const PEOPLE_LABELS = {
     "Wife":"👩 Wife", "Cooper":"🐕 Cooper", "Parents":"👨‍👩‍👦 Mom & Dad",
@@ -1255,7 +1255,12 @@
             && (fCity==="all" || tripHasCity(id, fCity));
       })
       .sort((a,b)=> TRIP_META[b].sort.localeCompare(TRIP_META[a].sort)); /* newest first */
+    const totalKm = ids.reduce((a,id)=>a+TRIP_META[id].km, 0);
+    document.getElementById("homeSubline").textContent =
+      `${ids.length} trip${ids.length===1?"":"s"} · ${totalKm.toLocaleString("en-IN")} km`;
+
     if(ids.length === 0){
+      document.getElementById("homeSubline").textContent = "";
       grid.innerHTML = `<div class="empty-state">No trips match that search.<br><b>Cooper suggests widening it. 🐾</b></div>`;
       return;
     }
