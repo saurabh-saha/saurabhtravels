@@ -1266,7 +1266,7 @@
         </div>
         <div class="meta">
           <div class="gray">${t.when}</div>
-          <div class="kms"><b>${t.totalLabel}</b></div>
+          <div class="kms gray">${t.totalLabel}</div>
         </div>`;
       card.onclick = ()=> openTrip(id);
       grid.appendChild(card);
@@ -1509,10 +1509,11 @@
   /* ================= RENDER / NAV ================= */
   function renderTrip(){
     const trip = TRIPS[curTrip];
-    document.getElementById("tripTitle").textContent = trip.name;
+    document.getElementById("tripTitle").textContent = trip.where;
 
     const sub = document.getElementById("tripSub");
-    const subItems = [trip.where, '·', ...trip.subline];
+    const subItems = trip.subline.filter(x=> x!=='·' && !/traveller/.test(x))
+      .reduce((a,x)=>{ if(a.length) a.push('·'); a.push(x); return a; }, []);
     sub.innerHTML = subItems.map(x=>
       x === '·' ? '<span class="dotsep">·</span>'
       : `<span class="${/\d/.test(x) ? 'gray' : ''}">${x}</span>`
