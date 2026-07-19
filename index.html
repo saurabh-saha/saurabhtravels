@@ -1521,12 +1521,12 @@
   /* ================= RENDER / NAV ================= */
   function renderTrip(){
     const trip = TRIPS[curTrip];
-    document.getElementById("tripTitle").textContent = `${trip.name} — ${trip.where}`;
+    document.getElementById("tripTitle").textContent = trip.name;
 
     const sub = document.getElementById("tripSub");
-    sub.innerHTML = trip.subline.map(x=>
+    const subItems = [trip.where, '·', ...trip.subline];
+    sub.innerHTML = subItems.map(x=>
       x === '·' ? '<span class="dotsep">·</span>'
-      : x.startsWith('★') ? `<span class="underl">${x}</span>`
       : `<span class="${/\d/.test(x) ? 'gray' : ''}">${x}</span>`
     ).join(" ");
 
