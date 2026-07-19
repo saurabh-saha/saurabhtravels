@@ -1262,12 +1262,10 @@
       card.className = "card";
       card.innerHTML = `
         <div class="thumb"><div class="thumbmap"></div>
-          <span class="badge">${t.badge}</span>
+          <span class="badge">${t.where}</span>
         </div>
         <div class="meta">
           <div class="row1"><b>${t.name}</b></div>
-          <div class="gray">${t.where}</div>
-          <div class="gray">${t.when}</div>
           <div class="kms"><b>${t.totalLabel}</b></div>
         </div>`;
       card.onclick = ()=> openTrip(id);
