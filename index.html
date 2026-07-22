@@ -440,6 +440,11 @@
       <div class="home-head">
         <h1>The drives</h1>
         <p id="homeSubline"></p>
+        <div class="leg-tabs" id="vehicleTabs" style="margin-top:14px">
+          <button class="leg-tab active" onclick="pickVehicle('all', event)">🗺 All trips</button>
+          <button class="leg-tab" onclick="pickVehicle('car', event)">🚗 Car trips</button>
+          <button class="leg-tab" onclick="pickVehicle('bike', event)">🏍 Bike rides</button>
+        </div>
       </div>
       <div class="grid" id="cardGrid"></div>
     </div>
@@ -527,21 +532,22 @@
         <div class="hname">Saurabh</div>
         <div class="hsub">Web developer · Bengaluru</div>
         <div class="host-stats">
-          <div class="hs"><div class="hv">9</div><div class="hk">road trips</div></div>
-          <div class="hs"><div class="hv">16,000+ km</div><div class="hk">driven across India</div></div>
-          <div class="hs"><div class="hv">2024</div><div class="hk">started driving</div></div>
+          <div class="hs"><div class="hv">29</div><div class="hk">road trips & bike rides</div></div>
+          <div class="hs"><div class="hv">21,000+ km</div><div class="hk">covered across India</div></div>
+          <div class="hs"><div class="hv">2015</div><div class="hk">started riding</div></div>
           <div class="hs"><div class="hv">2 dogs</div><div class="hk">Cooper 🐕 & Teddy 🐩</div></div>
         </div>
       </div>
       <div class="about-body">
         <h1>About this page</h1>
-        <p>This is my personal journey journal. Every trip here is a real drive — the routes, the cities, the crew in the car. I started driving in 2024 and haven't really stopped since; the plan, loosely, is to explore the length and breadth of India one highway at a time.</p>
+        <p>This is my personal journey journal. Every trip here is real — the routes, the cities, the crew along for the ride. It started on two wheels in 2015, moved to four in 2024, and hasn't really stopped since; the plan, loosely, is to explore the length and breadth of India one highway at a time.</p>
         <p>I live in Bengaluru with my wife and our two dogs — Cooper, a golden retriever who has seen more of India's coastline than most people, and Teddy, a poodle who mostly supervises from home.</p>
-        <p>I'm a web developer by profession. Driving is my escape — the one place where the only thing that needs debugging is the playlist.</p>
+        <p>I'm a web developer by profession. The road is my escape — the one place where the only thing that needs debugging is the playlist.</p>
         <div class="about-facts">
-          <div class="afact"><div class="ico">🚗</div><div><div class="k">2020 Hyundai i20 Asta automatic</div><div class="s">the only car on this site — every km on these pages is hers</div></div></div>
+          <div class="afact"><div class="ico">🚗</div><div><div class="k">2020 Hyundai i20 Asta automatic</div><div class="s">the only car on the road trips — every km on those pages is hers</div></div></div>
+          <div class="afact"><div class="ico">🏍</div><div><div class="k">Royal Enfield Classic 350</div><div class="s">the dream bike — ridden on more trips than any other, still don't own one</div></div></div>
           <div class="afact"><div class="ico">📍</div><div><div class="k">Based in Bengaluru</div><div class="s">every trip starts and ends at the same front door</div></div></div>
-          <div class="afact"><div class="ico">🛣</div><div><div class="k">Driving since 2024</div><div class="s">nine trips in, from the Himalayas to the southern cliffs</div></div></div>
+          <div class="afact"><div class="ico">🛣</div><div><div class="k">On the road since 2015</div><div class="s">twenty-nine trips in, from the Nilgiris to the Himalayas</div></div></div>
           <div class="afact"><div class="ico">🐕</div><div><div class="k">Cooper & Teddy</div><div class="s">golden retriever on tour · poodle on home duty</div></div></div>
           <div class="afact"><div class="ico">💻</div><div><div class="k">Web developer</div><div class="s">code all week, coast all weekend</div></div></div>
         </div>
@@ -778,6 +784,216 @@
      still references them) needs no changes. */
   const FULL_VIEW = null, GOA_VIEW = null, HOP_VIEW = null, PONDY_VIEW = null,
         CHIK_VIEW = null, HYD_VIEW = null, VARKALA_VIEW = null;
+
+  /* ---- Bike routes ---- */
+  const MYSORE_PATH = [
+    [12.97, 77.59], [12.72, 77.28], [12.65, 77.21], [12.58, 77.04],
+    [12.52, 76.90], [12.42, 76.70], [12.30, 76.65]
+  ];
+  const MYSORE_CITIES = [
+    { name:"Bengaluru",   lat:12.97, lng:77.59, side:"left"  },
+    { name:"Ramanagara",  lat:12.72, lng:77.28, side:"right" },
+    { name:"Mandya",      lat:12.52, lng:76.90, side:"left"  },
+    { name:"Mysore",      lat:12.30, lng:76.65, side:"right" }
+  ];
+  const OOTY_PATH = [
+    [12.97, 77.59], [12.30, 76.65], [11.67, 76.63], [11.50, 76.49], [11.41, 76.70]
+  ];
+  const OOTY_CITIES = [
+    { name:"Bengaluru", lat:12.97, lng:77.59, side:"left"  },
+    { name:"Mysore",    lat:12.30, lng:76.65, side:"right" },
+    { name:"Bandipur",  lat:11.67, lng:76.63, side:"left"  },
+    { name:"Ooty",      lat:11.41, lng:76.70, side:"right" }
+  ];
+  const COORG_PATH = [
+    [12.97, 77.59], [12.30, 76.65], [12.55, 75.96], [12.42, 75.74]
+  ];
+  const COORG_CITIES = [
+    { name:"Bengaluru",  lat:12.97, lng:77.59, side:"left"  },
+    { name:"Mysore",     lat:12.30, lng:76.65, side:"right" },
+    { name:"Kushalnagar",lat:12.55, lng:75.96, side:"left"  },
+    { name:"Madikeri",   lat:12.42, lng:75.74, side:"right" }
+  ];
+  const BHEEM_PATH = [
+    [12.97, 77.59], [12.55, 77.42], [12.40, 77.32]
+  ];
+  const BHEEM_CITIES = [
+    { name:"Bengaluru",     lat:12.97, lng:77.59, side:"left"  },
+    { name:"Kanakapura",    lat:12.55, lng:77.42, side:"right" },
+    { name:"Bheemeshwari",  lat:12.40, lng:77.32, side:"right" }
+  ];
+  const NANDI_PATH = [
+    [12.97, 77.59], [13.25, 77.71], [13.37, 77.68]
+  ];
+  const NANDI_CITIES = [
+    { name:"Bengaluru",   lat:12.97, lng:77.59, side:"left"  },
+    { name:"Devanahalli", lat:13.25, lng:77.71, side:"right" },
+    { name:"Nandi Hills", lat:13.37, lng:77.68, side:"right" }
+  ];
+  const CHUNCHI_PATH = [
+    [12.97, 77.59], [12.55, 77.42], [12.42, 77.42]
+  ];
+  const CHUNCHI_CITIES = [
+    { name:"Bengaluru",     lat:12.97, lng:77.59, side:"left"  },
+    { name:"Kanakapura",    lat:12.55, lng:77.42, side:"right" },
+    { name:"Chunchi Falls", lat:12.42, lng:77.42, side:"right" }
+  ];
+  const LEPAKSHI_PATH = [
+    [12.97, 77.59], [13.25, 77.71], [13.83, 77.49], [13.80, 77.60]
+  ];
+  const LEPAKSHI_CITIES = [
+    { name:"Bengaluru",   lat:12.97, lng:77.59, side:"left"  },
+    { name:"Devanahalli", lat:13.25, lng:77.71, side:"right" },
+    { name:"Hindupur",    lat:13.83, lng:77.49, side:"left"  },
+    { name:"Lepakshi",    lat:13.80, lng:77.60, side:"right" }
+  ];
+  const ANTARGANGE_PATH = [
+    [12.97, 77.59], [13.14, 78.13], [13.20, 78.18]
+  ];
+  const ANTARGANGE_CITIES = [
+    { name:"Bengaluru",    lat:12.97, lng:77.59, side:"left"  },
+    { name:"Kolar",        lat:13.14, lng:78.13, side:"right" },
+    { name:"Antargange",   lat:13.20, lng:78.18, side:"right" }
+  ];
+  const KODAI_PATH = [
+    [12.97, 77.59], [12.74, 77.83], [11.66, 78.15], [10.37, 77.98], [10.24, 77.49]
+  ];
+  const KODAI_CITIES = [
+    { name:"Bengaluru", lat:12.97, lng:77.59, side:"left"  },
+    { name:"Salem",     lat:11.66, lng:78.15, side:"right" },
+    { name:"Dindigul",  lat:10.37, lng:77.98, side:"left"  },
+    { name:"Kodaikanal",lat:10.24, lng:77.49, side:"right" }
+  ];
+  const SHOLAY_PATH = [
+    [12.97, 77.59], [12.83, 77.42], [12.72, 77.28], [12.66, 77.24]
+  ];
+  const SHOLAY_CITIES = [
+    { name:"Bengaluru",         lat:12.97, lng:77.59, side:"left"  },
+    { name:"Ramanagara",        lat:12.72, lng:77.28, side:"right" },
+    { name:"Ramadevarabetta",   lat:12.66, lng:77.24, side:"right" }
+  ];
+
+  /* Gangtok → Samdruptse → Namchi, Sikkim */
+  const SIKKIM_OUT_PATH = [
+    [27.3389, 88.6065],                 /* Gangtok */
+    [27.30,   88.55],
+    [27.20,   88.40],
+    [27.183,  88.333],                  /* Samdruptse */
+    [27.1667, 88.3667]                  /* Namchi */
+  ];
+  const SIKKIM_OUT_CITIES = [
+    { name:"Gangtok",     lat:27.3389, lng:88.6065, side:"left"  },
+    { name:"Samdruptse",  lat:27.183,  lng:88.333,  side:"right" },
+    { name:"Namchi",      lat:27.1667, lng:88.3667, side:"right" }
+  ];
+  /* return: Namchi → Temi Tea Garden → Gangtok */
+  const SIKKIM_BACK_PATH = [
+    [27.1667, 88.3667],                 /* Namchi */
+    [27.2977, 88.3535],                 /* Temi Tea Garden */
+    [27.32,   88.45],
+    [27.3389, 88.6065]                  /* Gangtok */
+  ];
+  const SIKKIM_BACK_CITIES = [
+    { name:"Namchi",           lat:27.1667, lng:88.3667, side:"left"  },
+    { name:"Temi Tea Garden",  lat:27.2977, lng:88.3535, side:"right" },
+    { name:"Gangtok",          lat:27.3389, lng:88.6065, side:"right" }
+  ];
+
+  /* Kasar Devi → Almora → Bageshwar → Munsiyari, Uttarakhand */
+  const MUNSIYARI_PATH = [
+    [29.6167, 79.6167],                 /* Kasar Devi */
+    [29.65,   79.67],                   /* Almora */
+    [29.85,   79.77],                   /* Bageshwar */
+    [29.95,   80.02],
+    [30.0667, 80.2333]                  /* Munsiyari */
+  ];
+  const MUNSIYARI_CITIES = [
+    { name:"Kasar Devi", lat:29.6167, lng:79.6167, side:"left"  },
+    { name:"Almora",     lat:29.65,   lng:79.67,   side:"right" },
+    { name:"Bageshwar",  lat:29.85,   lng:79.77,   side:"left"  },
+    { name:"Munsiyari",  lat:30.0667, lng:80.2333, side:"right" }
+  ];
+
+  /* Kasar Devi → Almora → Bhimtal → Nainital, Uttarakhand */
+  const RANIKHET_OUT_PATH = [
+    [29.6167, 79.6167],                 /* Kasar Devi */
+    [29.5971, 79.6591],                 /* Almora */
+    [29.3500, 79.5667],                 /* Bhimtal */
+    [29.3803, 79.4636]                  /* Nainital */
+  ];
+  const RANIKHET_OUT_CITIES = [
+    { name:"Kasar Devi", lat:29.6167, lng:79.6167, side:"left"  },
+    { name:"Almora",     lat:29.5971, lng:79.6591, side:"right" },
+    { name:"Bhimtal",    lat:29.3500, lng:79.5667, side:"left"  },
+    { name:"Nainital",   lat:29.3803, lng:79.4636, side:"right" }
+  ];
+  /* return: Nainital → Ranikhet → Almora → Kasar Devi */
+  const RANIKHET_BACK_PATH = [
+    [29.3803, 79.4636],                 /* Nainital */
+    [29.6425, 79.4319],                 /* Ranikhet */
+    [29.5971, 79.6591],                 /* Almora */
+    [29.6167, 79.6167]                  /* Kasar Devi */
+  ];
+  const RANIKHET_BACK_CITIES = [
+    { name:"Nainital",   lat:29.3803, lng:79.4636, side:"left"  },
+    { name:"Ranikhet",   lat:29.6425, lng:79.4319, side:"right" },
+    { name:"Almora",     lat:29.5971, lng:79.6591, side:"left"  },
+    { name:"Kasar Devi", lat:29.6167, lng:79.6167, side:"right" }
+  ];
+
+  /* Arambol → Panaji → Margao → Patnem → Galgibaga → Paradise Beach, Goa */
+  const GOA_SOUTH_PATH = [
+    [15.6870, 73.7050],                 /* Arambol */
+    [15.50,   73.83],                   /* Panaji */
+    [15.27,   73.96],                   /* Margao */
+    [15.0973, 74.0180],                 /* Patnem */
+    [15.0730, 74.0230],                 /* Galgibaga */
+    [15.0480, 74.0360]                  /* Paradise Beach */
+  ];
+  const GOA_SOUTH_CITIES = [
+    { name:"Arambol",         lat:15.6870, lng:73.7050, side:"left"  },
+    { name:"Panaji",          lat:15.50,   lng:73.83,   side:"right" },
+    { name:"Margao",          lat:15.27,   lng:73.96,   side:"left"  },
+    { name:"Patnem",          lat:15.0973, lng:74.0180, side:"right" },
+    { name:"Galgibaga",       lat:15.0730, lng:74.0230, side:"left"  },
+    { name:"Paradise Beach",  lat:15.0480, lng:74.0360, side:"right" }
+  ];
+
+  /* Bengaluru → Tumkur → Devarayanadurga (DD Hills) */
+  const DDHILLS_PATH = [
+    [12.97,   77.59],                   /* Bengaluru */
+    [13.34,   77.10],                   /* Tumkur */
+    [13.3667, 77.1167]                  /* Devarayanadurga */
+  ];
+  const DDHILLS_CITIES = [
+    { name:"Bengaluru",         lat:12.97,   lng:77.59,   side:"left"  },
+    { name:"Tumkur",            lat:13.34,   lng:77.10,   side:"right" },
+    { name:"Devarayanadurga",  lat:13.3667, lng:77.1167, side:"right" }
+  ];
+
+  /* Bengaluru → Magadi → Manchanabele Dam */
+  const MANCHANABELE_PATH = [
+    [12.97,   77.59],                   /* Bengaluru */
+    [12.9667, 77.2333],                 /* Magadi */
+    [12.8167, 77.2167]                  /* Manchanabele Dam */
+  ];
+  const MANCHANABELE_CITIES = [
+    { name:"Bengaluru",           lat:12.97,   lng:77.59,   side:"left"  },
+    { name:"Magadi",              lat:12.9667, lng:77.2333, side:"right" },
+    { name:"Manchanabele Dam",    lat:12.8167, lng:77.2167, side:"right" }
+  ];
+
+  /* Kothrud (Pune) → Paud → Pawna Lake */
+  const PAWNA_PATH = [
+    [18.5074, 73.8077],                 /* Kothrud */
+    [18.5667, 73.6167],                 /* Paud */
+    [18.6667, 73.4667]                  /* Pawna Lake */
+  ];
+  const PAWNA_CITIES = [
+    { name:"Kothrud",     lat:18.5074, lng:73.8077, side:"left"  },
+    { name:"Paud",        lat:18.5667, lng:73.6167, side:"right" },
+    { name:"Pawna Lake",  lat:18.6667, lng:73.4667, side:"right" }
+  ];
 
   /* ================= TRIPS ================= */
   const TRIPS = {
@@ -1083,25 +1299,649 @@
           sub:"Hyderabad → Bengaluru · same road as October, five months early",
           path:HYD_PATH, cities:HYD_CITIES, reverse:true, km:570, hrs:9, view:HYD_VIEW }
       ]
+    },
+    t10: {
+      name: "First Long Ride",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Mysore",
+      when: "Jun 2015",
+      totalLabel: "~300 km round trip",
+      badge: "Solo ride",
+      rating: "★ 4.7",
+      subline: ['Solo', '·', 'Jun 2015'],
+      thumbPaths: [MYSORE_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the first long ride</span>',
+      fullSub: "Bengaluru → Mysore → Bengaluru · the ride that started it",
+      facts: [
+        { i:"🗓", k:"June 2015", s:"the first ride further than a college run" },
+        { i:"🏍", k:"Yamaha FZ16", s:"just a bike and an open road" },
+        { i:"🧑", k:"Solo", s:"no one else to blame for wrong turns" },
+        { i:"🛣", k:"Via Ramanagara & Mandya", s:"~150 km each way · Mysore Palace and back before dark" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Mysore",
+          title:'Going <span>→ Mysore</span>',
+          sub:"Bengaluru → Ramanagara → Mandya → Mysore",
+          path:MYSORE_PATH, cities:MYSORE_CITIES, reverse:false, km:150, hrs:3.5 },
+        { tab:"↓ Back — Mysore → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Mysore → Bengaluru · same road, first taste of a long ride",
+          path:MYSORE_PATH, cities:MYSORE_CITIES, reverse:true, km:150, hrs:3.5 }
+      ]
+    },
+    t11: {
+      name: "Into the Blue Hills",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Ooty",
+      when: "Jan 2016",
+      totalLabel: "~540 km round trip",
+      badge: "First Enfield ride",
+      rating: "★ 4.9",
+      subline: ['2 riders', '·', 'Jan 2016'],
+      thumbPaths: [OOTY_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ into the Nilgiris</span>',
+      fullSub: "Bengaluru → Mysore → Bandipur → Ooty → Bengaluru",
+      facts: [
+        { i:"🗓", k:"January 2016", s:"cold mornings, hairpin bends, hot chai" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"the bike that did every ride after this one" },
+        { i:"🧑", k:"Saurabh · Ankur", s:"two riders, one Enfield" },
+        { i:"🛣", k:"Via Mysore & Bandipur forest", s:"~270 km each way · wildlife crossings through Bandipur" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Ooty",
+          title:'Going <span>→ the Nilgiris</span>',
+          sub:"Bengaluru → Mysore → Bandipur → Gudalur → Ooty",
+          path:OOTY_PATH, cities:OOTY_CITIES, reverse:false, km:270, hrs:6.5 },
+        { tab:"↓ Back — Ooty → BLR",
+          title:'Return <span>→ down from the hills</span>',
+          sub:"Ooty → Bandipur → Mysore → Bengaluru",
+          path:OOTY_PATH, cities:OOTY_CITIES, reverse:true, km:270, hrs:6.5 }
+      ]
+    },
+    t12: {
+      name: "Coffee Country, on Two Wheels",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Coorg",
+      when: "Feb 2016",
+      totalLabel: "~500 km round trip",
+      badge: "The whole gang",
+      rating: "★ 4.9",
+      subline: ['4 riders', '·', 'Feb 2016'],
+      thumbPaths: [COORG_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ Coorg on two wheels</span>',
+      fullSub: "Bengaluru → Mysore → Kushalnagar → Madikeri → Bengaluru",
+      facts: [
+        { i:"🗓", k:"February 2016", s:"a four-bike convoy into the coffee hills" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"riding in formation, one horn at a time" },
+        { i:"🧑", k:"Ankur · Shalin · Hrithik · Dinesh", s:"brother and friends, spread across bikes" },
+        { i:"🛣", k:"Via Mysore & Kushalnagar", s:"~250 km each way · mist over the coffee estates" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Coorg",
+          title:'Going <span>→ the coffee hills</span>',
+          sub:"Bengaluru → Mysore → Kushalnagar → Madikeri",
+          path:COORG_PATH, cities:COORG_CITIES, reverse:false, km:250, hrs:6 },
+        { tab:"↓ Back — Coorg → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Madikeri → Kushalnagar → Mysore → Bengaluru",
+          path:COORG_PATH, cities:COORG_CITIES, reverse:true, km:250, hrs:6 }
+      ]
+    },
+    t13: {
+      name: "Riverside Run",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Bheemeshwari",
+      when: "Mar 2016",
+      totalLabel: "~200 km round trip",
+      badge: "Weekend ride",
+      rating: "★ 4.6",
+      subline: ['5 riders', '·', 'Mar 2016'],
+      thumbPaths: [BHEEM_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ down to the Cauvery</span>',
+      fullSub: "Bengaluru → Kanakapura → Bheemeshwari → Bengaluru",
+      facts: [
+        { i:"🗓", k:"March 2016", s:"a short ride to the riverside" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"a lazy, low-speed weekend run" },
+        { i:"🧑", k:"Hrithik · Ankur · Shalin · Jhala", s:"the crew, minus a headcount plan" },
+        { i:"🛣", k:"Via Kanakapura", s:"~100 km each way · quiet forest roads to the Cauvery" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Bheemeshwari",
+          title:'Going <span>→ the riverside</span>',
+          sub:"Bengaluru → Kanakapura → Bheemeshwari",
+          path:BHEEM_PATH, cities:BHEEM_CITIES, reverse:false, km:100, hrs:2.5 },
+        { tab:"↓ Back — Bheemeshwari → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Bheemeshwari → Kanakapura → Bengaluru",
+          path:BHEEM_PATH, cities:BHEEM_CITIES, reverse:true, km:100, hrs:2.5 }
+      ]
+    },
+    t14: {
+      name: "Sunrise at Nandi",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Nandi Hills",
+      when: "May 2016",
+      totalLabel: "~120 km round trip",
+      badge: "Solo sunrise ride",
+      rating: "★ 4.7",
+      subline: ['Solo', '·', 'May 2016'],
+      thumbPaths: [NANDI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ a solo sunrise</span>',
+      fullSub: "Bengaluru → Nandi Hills → Bengaluru · an early morning ride",
+      facts: [
+        { i:"🗓", k:"May 2016", s:"a 4 AM alarm for a sunrise above the clouds" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"empty roads before the city woke up" },
+        { i:"🧑", k:"Solo", s:"just the bike and the hairpin bends" },
+        { i:"🛣", k:"Via Devanahalli", s:"~60 km each way · Nandi's easiest and most-repeated ride" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Nandi Hills",
+          title:'Going <span>→ the hilltop</span>',
+          sub:"Bengaluru → Devanahalli → Nandi Hills",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:false, km:60, hrs:1.5 },
+        { tab:"↓ Back — Nandi Hills → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Nandi Hills → Devanahalli → Bengaluru",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:true, km:60, hrs:1.5 }
+      ]
+    },
+    t15: {
+      name: "Back to Nandi",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Nandi Hills",
+      when: "May 2016",
+      totalLabel: "~120 km round trip",
+      badge: "Repeat ride",
+      rating: "★ 4.7",
+      subline: ['3 riders', '·', 'May 2016'],
+      thumbPaths: [NANDI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the second Nandi ride</span>',
+      fullSub: "Bengaluru → Nandi Hills → Bengaluru · same hill, new company",
+      facts: [
+        { i:"🗓", k:"May 2016", s:"back up the same hill, a couple weeks later" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"the go-to bike for the go-to hill" },
+        { i:"🧑", k:"Shalin · Ankur", s:"showing the regulars why it's worth the 4 AM start" },
+        { i:"🛣", k:"Via Devanahalli", s:"~60 km each way · the easiest escape from the city" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Nandi Hills",
+          title:'Going <span>→ the hilltop</span>',
+          sub:"Bengaluru → Devanahalli → Nandi Hills",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:false, km:60, hrs:1.5 },
+        { tab:"↓ Back — Nandi Hills → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Nandi Hills → Devanahalli → Bengaluru",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:true, km:60, hrs:1.5 }
+      ]
+    },
+    t16: {
+      name: "Chasing Chunchi",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Chunchi Falls",
+      when: "Sep 2016",
+      totalLabel: "~140 km round trip",
+      badge: "Monsoon ride",
+      rating: "★ 4.6",
+      subline: ['5 riders', '·', 'Sep 2016'],
+      thumbPaths: [CHUNCHI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ chasing the falls</span>',
+      fullSub: "Bengaluru → Kanakapura → Chunchi Falls → Bengaluru",
+      facts: [
+        { i:"🗓", k:"September 2016", s:"the falls in full monsoon flow" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"muddy boots, happy bikes" },
+        { i:"🧑", k:"Hrithik · Ankur · Shalin · Jhala", s:"the usual crew, off-road for a stretch" },
+        { i:"🛣", k:"Via Kanakapura", s:"~70 km each way · a short ride to a loud waterfall" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Chunchi Falls",
+          title:'Going <span>→ the falls</span>',
+          sub:"Bengaluru → Kanakapura → Chunchi Falls",
+          path:CHUNCHI_PATH, cities:CHUNCHI_CITIES, reverse:false, km:70, hrs:2 },
+        { tab:"↓ Back — Chunchi Falls → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Chunchi Falls → Kanakapura → Bengaluru",
+          path:CHUNCHI_PATH, cities:CHUNCHI_CITIES, reverse:true, km:70, hrs:2 }
+      ]
+    },
+    t17: {
+      name: "Temples at Lepakshi",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Lepakshi",
+      when: "Oct 2016",
+      totalLabel: "~240 km round trip",
+      badge: "Duo ride",
+      rating: "★ 4.7",
+      subline: ['2 riders', '·', 'Oct 2016'],
+      thumbPaths: [LEPAKSHI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the hanging pillar</span>',
+      fullSub: "Bengaluru → Hindupur → Lepakshi → Bengaluru",
+      facts: [
+        { i:"🗓", k:"October 2016", s:"a day trip to the Vijayanagara temple" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"two up, straight highway both ways" },
+        { i:"🧑", k:"Hrithik · Shalin", s:"a quick duo run across the state line" },
+        { i:"🛣", k:"Via Devanahalli & Hindupur", s:"~120 km each way · the hanging pillar at Lepakshi" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Lepakshi",
+          title:'Going <span>→ the temple</span>',
+          sub:"Bengaluru → Devanahalli → Hindupur → Lepakshi",
+          path:LEPAKSHI_PATH, cities:LEPAKSHI_CITIES, reverse:false, km:120, hrs:3 },
+        { tab:"↓ Back — Lepakshi → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Lepakshi → Hindupur → Devanahalli → Bengaluru",
+          path:LEPAKSHI_PATH, cities:LEPAKSHI_CITIES, reverse:true, km:120, hrs:3 }
+      ]
+    },
+    t18: {
+      name: "Nandi With Dad",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Nandi Hills",
+      when: "Nov 2016",
+      totalLabel: "~120 km round trip",
+      badge: "Father & son",
+      rating: "★ 5.0",
+      subline: ['2 riders', '·', 'Nov 2016'],
+      thumbPaths: [NANDI_PATH],
+      hasNote: false,
+      fullTitle: "Full trip <span>→ Dad's first pillion ride</span>",
+      fullSub: "Bengaluru → Nandi Hills → Bengaluru · Dad on the back seat",
+      facts: [
+        { i:"🗓", k:"November 2016", s:"a slower ride, taken at Dad's pace" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"careful cornering with a precious pillion" },
+        { i:"🧑", k:"Dad · Saurabh", s:"his first ride up the hill his son keeps returning to" },
+        { i:"🛣", k:"Via Devanahalli", s:"~60 km each way · the familiar road, new company" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Nandi Hills",
+          title:'Going <span>→ the hilltop</span>',
+          sub:"Bengaluru → Devanahalli → Nandi Hills",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:false, km:60, hrs:1.5 },
+        { tab:"↓ Back — Nandi Hills → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Nandi Hills → Devanahalli → Bengaluru",
+          path:NANDI_PATH, cities:NANDI_CITIES, reverse:true, km:60, hrs:1.5 }
+      ]
+    },
+    t19: {
+      name: "Caves of Antargange",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Antargange",
+      when: "Feb 2017",
+      totalLabel: "~140 km round trip",
+      badge: "Trek & ride",
+      rating: "★ 4.7",
+      subline: ['3 riders', '·', 'Feb 2017'],
+      thumbPaths: [ANTARGANGE_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the caves near Kolar</span>',
+      fullSub: "Bengaluru → Kolar → Antargange → Bengaluru",
+      facts: [
+        { i:"🗓", k:"February 2017", s:"a ride followed by a scramble through rock caves" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"parked at the base, hiking boots on" },
+        { i:"🧑", k:"Ankur · Shalin", s:"the regular pair, exploring somewhere new" },
+        { i:"🛣", k:"Via Kolar", s:"~70 km each way · caves and a hilltop temple" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Antargange",
+          title:'Going <span>→ the caves</span>',
+          sub:"Bengaluru → Kolar → Antargange",
+          path:ANTARGANGE_PATH, cities:ANTARGANGE_CITIES, reverse:false, km:70, hrs:2 },
+        { tab:"↓ Back — Antargange → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Antargange → Kolar → Bengaluru",
+          path:ANTARGANGE_PATH, cities:ANTARGANGE_CITIES, reverse:true, km:70, hrs:2 }
+      ]
+    },
+    t20: {
+      name: "Alone to Kodaikanal",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Kodaikanal",
+      when: "May 2017",
+      totalLabel: "~920 km round trip",
+      badge: "Solo hill ride",
+      rating: "★ 4.9",
+      subline: ['Solo', '·', 'May 2017'],
+      thumbPaths: [KODAI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ alone into the hills</span>',
+      fullSub: "Bengaluru → Salem → Dindigul → Kodaikanal → Bengaluru",
+      facts: [
+        { i:"🗓", k:"May 2017", s:"the longest solo ride yet, chasing hill-station cold" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"loaded with a duffel bag, nothing else planned" },
+        { i:"🧑", k:"Solo", s:"a full day each way, just the bike for company" },
+        { i:"🛣", k:"Via Hosur, Salem & Dindigul", s:"~460 km each way · the ghat road up to Kodai" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Kodaikanal",
+          title:'Going <span>→ the hill station</span>',
+          sub:"Bengaluru → Hosur → Salem → Dindigul → Kodaikanal",
+          path:KODAI_PATH, cities:KODAI_CITIES, reverse:false, km:460, hrs:10 },
+        { tab:"↓ Back — Kodaikanal → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Kodaikanal → Dindigul → Salem → Bengaluru",
+          path:KODAI_PATH, cities:KODAI_CITIES, reverse:true, km:460, hrs:10 }
+      ]
+    },
+    t21: {
+      name: "The Sholay Rocks",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Ramanagara",
+      when: "Jun 2017",
+      totalLabel: "~100 km round trip",
+      badge: "Movie-spot ride",
+      rating: "★ 4.8",
+      subline: ['2 riders', '·', 'Jun 2017'],
+      thumbPaths: [SHOLAY_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ Sholay country</span>',
+      fullSub: "Bengaluru → Ramanagara → Ramadevarabetta → Bengaluru",
+      facts: [
+        { i:"🗓", k:"June 2017", s:"a short ride out to where Sholay was filmed" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"an easy half-day loop, no highway needed" },
+        { i:"🧑", k:"Saurabh · Ankur", s:"scrambling up the rocks Gabbar once stood on" },
+        { i:"🛣", k:"Via Ramanagara", s:"~50 km each way · the boulders of Ramadevarabetta" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Ramanagara",
+          title:'Going <span>→ Sholay country</span>',
+          sub:"Bengaluru → Ramanagara → Ramadevarabetta",
+          path:SHOLAY_PATH, cities:SHOLAY_CITIES, reverse:false, km:50, hrs:1.5 },
+        { tab:"↓ Back — Ramanagara → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Ramadevarabetta → Ramanagara → Bengaluru",
+          path:SHOLAY_PATH, cities:SHOLAY_CITIES, reverse:true, km:50, hrs:1.5 }
+      ]
+    },
+    t22: {
+      name: "Into the Himalayas",
+      vehicle: "bike",
+      where: "Gangtok ↔ Namchi",
+      when: "Apr 2022",
+      totalLabel: "~160 km round trip",
+      badge: "Solo Sikkim ride",
+      rating: "★ 5.0",
+      subline: ['Solo', '·', 'Apr 2022'],
+      thumbPaths: [SIKKIM_OUT_PATH, SIKKIM_BACK_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the real Himalayas</span>',
+      fullSub: "Gangtok → Samdruptse → Namchi → Temi Tea Garden → Gangtok",
+      facts: [
+        { i:"🗓", k:"April 2022", s:"a solo ride through the hills of South Sikkim" },
+        { i:"🏍", k:"Royal Enfield Himalayan", s:"the bike finally living up to its name" },
+        { i:"🧑", k:"Solo", s:"mountain roads, mist, and nobody to answer to" },
+        { i:"🛣", k:"Via Samdruptse & Temi Tea Garden", s:"~80 km each way · the giant statue at Samdruptse, tea gardens on the way back" }
+      ],
+      legs: [
+        { tab:"↑ Going — Gangtok → Namchi",
+          title:'Going <span>→ Samdruptse & Namchi</span>',
+          sub:"Gangtok → Samdruptse → Namchi",
+          path:SIKKIM_OUT_PATH, cities:SIKKIM_OUT_CITIES, reverse:false, km:80, hrs:3 },
+        { tab:"↓ Back — Namchi → Gangtok",
+          title:'Return <span>→ via the tea gardens</span>',
+          sub:"Namchi → Temi Tea Garden → Gangtok",
+          path:SIKKIM_BACK_PATH, cities:SIKKIM_BACK_CITIES, reverse:false, km:80, hrs:3.5 }
+      ]
+    },
+    t23: {
+      name: "Brothers to Munsiyari",
+      vehicle: "bike",
+      where: "Kasar Devi ↔ Munsiyari",
+      when: "Nov 2020",
+      totalLabel: "~370 km round trip",
+      badge: "Brothers' ride",
+      rating: "★ 5.0",
+      subline: ['2 riders', '·', 'Nov 2020'],
+      thumbPaths: [MUNSIYARI_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ to the end of the valley</span>',
+      fullSub: "Kasar Devi → Almora → Bageshwar → Munsiyari → Kasar Devi",
+      facts: [
+        { i:"🗓", k:"November 2020", s:"a brothers' ride deep into Kumaon" },
+        { i:"🏍", k:"Royal Enfield Bullet", s:"thumping through the hills of Uttarakhand" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers, one bike, one long mountain road" },
+        { i:"🛣", k:"Via Almora & Bageshwar", s:"~185 km each way · Panchachuli peaks at the end of the road" }
+      ],
+      legs: [
+        { tab:"↑ Going — Kasar Devi → Munsiyari",
+          title:'Going <span>→ deeper into Kumaon</span>',
+          sub:"Kasar Devi → Almora → Bageshwar → Munsiyari",
+          path:MUNSIYARI_PATH, cities:MUNSIYARI_CITIES, reverse:false, km:185, hrs:7 },
+        { tab:"↓ Back — Munsiyari → Kasar Devi",
+          title:'Return <span>→ back down the valley</span>',
+          sub:"Munsiyari → Bageshwar → Almora → Kasar Devi",
+          path:MUNSIYARI_PATH, cities:MUNSIYARI_CITIES, reverse:true, km:185, hrs:7 }
+      ]
+    },
+    t24: {
+      name: "The Kumaon Lakes Loop",
+      vehicle: "bike",
+      where: "Kasar Devi ↔ Nainital",
+      when: "Oct 2020",
+      totalLabel: "~180 km round trip",
+      badge: "Brothers' ride",
+      rating: "★ 4.9",
+      subline: ['2 riders', '·', 'Oct 2020'],
+      thumbPaths: [RANIKHET_OUT_PATH, RANIKHET_BACK_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the lakes of Kumaon</span>',
+      fullSub: "Kasar Devi → Bhimtal → Nainital → Ranikhet → Kasar Devi",
+      facts: [
+        { i:"🗓", k:"October 2020", s:"the warm-up ride, a month before Munsiyari" },
+        { i:"🏍", k:"Royal Enfield Bullet", s:"the same bike that would go further a month later" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers again, a lake-hopping loop this time" },
+        { i:"🛣", k:"Via Almora, Bhimtal & Nainital", s:"~90 km each way · a loop through Ranikhet on the way back" }
+      ],
+      legs: [
+        { tab:"↑ Going — Kasar Devi → Nainital",
+          title:'Going <span>→ Bhimtal & Nainital</span>',
+          sub:"Kasar Devi → Almora → Bhimtal → Nainital",
+          path:RANIKHET_OUT_PATH, cities:RANIKHET_OUT_CITIES, reverse:false, km:90, hrs:3.5 },
+        { tab:"↓ Back — Nainital → Kasar Devi",
+          title:'Return <span>→ via Ranikhet</span>',
+          sub:"Nainital → Ranikhet → Almora → Kasar Devi",
+          path:RANIKHET_BACK_PATH, cities:RANIKHET_BACK_CITIES, reverse:false, km:90, hrs:3.5 }
+      ]
+    },
+    t25: {
+      name: "South Goa Beach Hop",
+      vehicle: "bike",
+      where: "Arambol ↔ Paradise Beach",
+      when: "Feb 2021",
+      totalLabel: "~180 km round trip",
+      badge: "Brothers' beach ride",
+      rating: "★ 4.9",
+      subline: ['2 riders', '·', 'Feb 2021'],
+      thumbPaths: [GOA_SOUTH_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ north to south Goa</span>',
+      fullSub: "Arambol → Patnem → Galgibaga → Paradise Beach → Arambol",
+      facts: [
+        { i:"🗓", k:"February 2021", s:"the length of Goa's coast, beach to beach" },
+        { i:"🏍", k:"Royal Enfield Classic 350", s:"sand in the boots by the end of it" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers, chasing the quietest beaches in the south" },
+        { i:"🛣", k:"Via Panaji & Margao", s:"~90 km each way · Arambol down to Patnem, Galgibaga & Paradise Beach" }
+      ],
+      legs: [
+        { tab:"↑ Going — Arambol → Paradise Beach",
+          title:'Going <span>→ the quiet south</span>',
+          sub:"Arambol → Panaji → Margao → Patnem → Galgibaga → Paradise Beach",
+          path:GOA_SOUTH_PATH, cities:GOA_SOUTH_CITIES, reverse:false, km:90, hrs:3 },
+        { tab:"↓ Back — Paradise Beach → Arambol",
+          title:'Return <span>→ home</span>',
+          sub:"Paradise Beach → Galgibaga → Patnem → Margao → Panaji → Arambol",
+          path:GOA_SOUTH_PATH, cities:GOA_SOUTH_CITIES, reverse:true, km:90, hrs:3 }
+      ]
+    },
+    t26: {
+      name: "Up to DD Hills",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Devarayanadurga",
+      when: "Mar 2023",
+      totalLabel: "~140 km round trip",
+      badge: "Brothers' ride",
+      rating: "★ 4.6",
+      subline: ['2 riders', '·', 'Mar 2023'],
+      thumbPaths: [DDHILLS_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the fort on the hill</span>',
+      fullSub: "Bengaluru → Tumkur → Devarayanadurga → Bengaluru",
+      facts: [
+        { i:"🗓", k:"March 2023", s:"a quick weekend escape to the hills near Tumkur" },
+        { i:"🏍", k:"Suzuki SX250", s:"a different bike, same brotherly route-finding" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers, back on two wheels together" },
+        { i:"🛣", k:"Via Tumkur", s:"~70 km each way · forest steps up to the old fort" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → DD Hills",
+          title:'Going <span>→ Devarayanadurga</span>',
+          sub:"Bengaluru → Tumkur → Devarayanadurga",
+          path:DDHILLS_PATH, cities:DDHILLS_CITIES, reverse:false, km:70, hrs:2 },
+        { tab:"↓ Back — DD Hills → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Devarayanadurga → Tumkur → Bengaluru",
+          path:DDHILLS_PATH, cities:DDHILLS_CITIES, reverse:true, km:70, hrs:2 }
+      ]
+    },
+    t27: {
+      name: "Bheemeshwari, Round Two",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Bheemeshwari",
+      when: "Apr 2023",
+      totalLabel: "~200 km round trip",
+      badge: "Brothers' ride",
+      rating: "★ 4.7",
+      subline: ['2 riders', '·', 'Apr 2023'],
+      thumbPaths: [BHEEM_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ back to the river</span>',
+      fullSub: "Bengaluru → Kanakapura → Bheemeshwari → Bengaluru",
+      facts: [
+        { i:"🗓", k:"April 2023", s:"seven years on, the same riverside, a new bike" },
+        { i:"🏍", k:"Bajaj Dominar 250", s:"a heavier, faster ride than the old Enfield" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers, revisiting an old favourite" },
+        { i:"🛣", k:"Via Kanakapura", s:"~100 km each way · the same quiet forest roads as 2016" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Bheemeshwari",
+          title:'Going <span>→ the riverside</span>',
+          sub:"Bengaluru → Kanakapura → Bheemeshwari",
+          path:BHEEM_PATH, cities:BHEEM_CITIES, reverse:false, km:100, hrs:2.5 },
+        { tab:"↓ Back — Bheemeshwari → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Bheemeshwari → Kanakapura → Bengaluru",
+          path:BHEEM_PATH, cities:BHEEM_CITIES, reverse:true, km:100, hrs:2.5 }
+      ]
+    },
+    t28: {
+      name: "Manchanabele Dam Run",
+      vehicle: "bike",
+      where: "Bengaluru ↔ Manchanabele Dam",
+      when: "Apr 2023",
+      totalLabel: "~80 km round trip",
+      badge: "Brothers' ride",
+      rating: "★ 4.6",
+      subline: ['2 riders', '·', 'Apr 2023'],
+      thumbPaths: [MANCHANABELE_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ an evening at the dam</span>',
+      fullSub: "Bengaluru → Magadi → Manchanabele Dam → Bengaluru",
+      facts: [
+        { i:"🗓", k:"April 2023", s:"a short evening ride out on the Magadi road" },
+        { i:"🏍", k:"Yezdi Scrambler", s:"a retro engine note echoing off the water" },
+        { i:"🧑", k:"Saurabh · Hrithik", s:"brothers, out for sunset by the reservoir" },
+        { i:"🛣", k:"Via Magadi", s:"~40 km each way · the backwaters of the Arkavathy" }
+      ],
+      legs: [
+        { tab:"↑ Going — BLR → Manchanabele Dam",
+          title:'Going <span>→ the reservoir</span>',
+          sub:"Bengaluru → Magadi → Manchanabele Dam",
+          path:MANCHANABELE_PATH, cities:MANCHANABELE_CITIES, reverse:false, km:40, hrs:1.2 },
+        { tab:"↓ Back — Manchanabele Dam → BLR",
+          title:'Return <span>→ home</span>',
+          sub:"Manchanabele Dam → Magadi → Bengaluru",
+          path:MANCHANABELE_PATH, cities:MANCHANABELE_CITIES, reverse:true, km:40, hrs:1.2 }
+      ]
+    },
+    t29: {
+      name: "Kothrud to Pawna Lake",
+      vehicle: "bike",
+      where: "Kothrud ↔ Pawna Lake",
+      when: "Sep 2023",
+      totalLabel: "~120 km round trip",
+      badge: "Solo ride",
+      rating: "★ 4.7",
+      subline: ['Solo', '·', 'Sep 2023'],
+      thumbPaths: [PAWNA_PATH],
+      hasNote: false,
+      fullTitle: 'Full trip <span>→ the monsoon lake</span>',
+      fullSub: "Kothrud → Paud → Pawna Lake → Kothrud",
+      facts: [
+        { i:"🗓", k:"September 2023", s:"a solo evening ride out of Pune, monsoon clouds still hanging around" },
+        { i:"🏍", k:"Yezdi Scrambler", s:"the same scrambler, a new city to ride out of" },
+        { i:"🧑", k:"Solo", s:"just the lake, the hills, and the ride back in the dark" },
+        { i:"🛣", k:"Via Paud", s:"~60 km each way · green hills dropping into the backwaters" }
+      ],
+      legs: [
+        { tab:"↑ Going — Kothrud → Pawna Lake",
+          title:'Going <span>→ the lake</span>',
+          sub:"Kothrud → Paud → Pawna Lake",
+          path:PAWNA_PATH, cities:PAWNA_CITIES, reverse:false, km:60, hrs:1.8 },
+        { tab:"↓ Back — Pawna Lake → Kothrud",
+          title:'Return <span>→ home</span>',
+          sub:"Pawna Lake → Paud → Kothrud",
+          path:PAWNA_PATH, cities:PAWNA_CITIES, reverse:true, km:60, hrs:1.8 }
+      ]
     }
   };
-  const TRIP_ORDER = ["t1","t2","t3","t4","t5","t6","t7","t8","t9"];
+  const TRIP_ORDER = ["t1","t2","t3","t4","t5","t6","t7","t8","t9",
+    "t10","t11","t12","t13","t14","t15","t16","t17","t18","t19","t20","t21","t22","t23","t24","t25",
+    "t26","t27","t28","t29"];
 
   /* date + crew metadata for sorting & filtering */
   const TRIP_META = {
-    t1: { sort:"2025-02", years:[2025],      people:["Wife","Cooper"],                   km:4912 },
-    t2: { sort:"2024-12", years:[2024,2025], people:["Wife","Cooper","Hrithik","Manasa"], km:5112 },
-    t3: { sort:"2024-08", years:[2024],      people:["Wife","Cooper"],                   km:1322 },
-    t4: { sort:"2025-08", years:[2025],      people:["Aryan"],                           km:640  },
-    t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"],          km:490  },
-    t6: { sort:"2025-10", years:[2025],      people:["Hrithik"],                         km:1140 },
-    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"],                   km:1510 },
-    t8: { sort:"2024-09", years:[2024],      people:["Wife","Cooper"],                   km:640  },
-    t9: { sort:"2025-05", years:[2025],      people:["Wife","Cooper","Hrithik"],          km:1140 }
+    t1: { sort:"2025-02", years:[2025],      people:["Wife","Cooper"],                   km:4912, vehicle:"car" },
+    t2: { sort:"2024-12", years:[2024,2025], people:["Wife","Cooper","Hrithik","Manasa"], km:5112, vehicle:"car" },
+    t3: { sort:"2024-08", years:[2024],      people:["Wife","Cooper"],                   km:1322, vehicle:"car" },
+    t4: { sort:"2025-08", years:[2025],      people:["Aryan"],                           km:640,  vehicle:"car" },
+    t5: { sort:"2024-07", years:[2024],      people:["Wife","Cooper","Parents"],          km:490,  vehicle:"car" },
+    t6: { sort:"2025-10", years:[2025],      people:["Hrithik"],                         km:1140, vehicle:"car" },
+    t7: { sort:"2026-01", years:[2026],      people:["Wife","Cooper"],                   km:1510, vehicle:"car" },
+    t8: { sort:"2024-09", years:[2024],      people:["Wife","Cooper"],                   km:640,  vehicle:"car" },
+    t9: { sort:"2025-05", years:[2025],      people:["Wife","Cooper","Hrithik"],          km:1140, vehicle:"car" },
+    t10:{ sort:"2015-06", years:[2015],      people:[],                                  km:300,  vehicle:"bike" },
+    t11:{ sort:"2016-01", years:[2016],      people:["Ankur"],                           km:540,  vehicle:"bike" },
+    t12:{ sort:"2016-02", years:[2016],      people:["Ankur","Shalin","Hrithik","Dinesh"],km:500,  vehicle:"bike" },
+    t13:{ sort:"2016-03", years:[2016],      people:["Hrithik","Ankur","Shalin","Jhala"], km:200,  vehicle:"bike" },
+    t14:{ sort:"2016-05-01", years:[2016],   people:[],                                  km:120,  vehicle:"bike" },
+    t15:{ sort:"2016-05-15", years:[2016],   people:["Shalin","Ankur"],                  km:120,  vehicle:"bike" },
+    t16:{ sort:"2016-09", years:[2016],      people:["Hrithik","Ankur","Shalin","Jhala"], km:140,  vehicle:"bike" },
+    t17:{ sort:"2016-10", years:[2016],      people:["Hrithik","Shalin"],                km:240,  vehicle:"bike" },
+    t18:{ sort:"2016-11", years:[2016],      people:["Dad"],                             km:120,  vehicle:"bike" },
+    t19:{ sort:"2017-02", years:[2017],      people:["Ankur","Shalin"],                  km:140,  vehicle:"bike" },
+    t20:{ sort:"2017-05", years:[2017],      people:[],                                  km:920,  vehicle:"bike" },
+    t21:{ sort:"2017-06", years:[2017],      people:["Ankur"],                           km:100,  vehicle:"bike" },
+    t22:{ sort:"2022-04", years:[2022],      people:[],                                  km:160,  vehicle:"bike" },
+    t23:{ sort:"2020-11", years:[2020],      people:["Hrithik"],                         km:370,  vehicle:"bike" },
+    t24:{ sort:"2020-10", years:[2020],      people:["Hrithik"],                         km:180,  vehicle:"bike" },
+    t25:{ sort:"2021-02", years:[2021],      people:["Hrithik"],                         km:180,  vehicle:"bike" },
+    t26:{ sort:"2023-03", years:[2023],      people:["Hrithik"],                         km:140,  vehicle:"bike" },
+    t27:{ sort:"2023-04-01", years:[2023],   people:["Hrithik"],                         km:200,  vehicle:"bike" },
+    t28:{ sort:"2023-04-15", years:[2023],   people:["Hrithik"],                         km:80,   vehicle:"bike" },
+    t29:{ sort:"2023-09", years:[2023],      people:[],                                  km:120,  vehicle:"bike" }
   };
   const PEOPLE_LABELS = {
     "Wife":"👩 Wife", "Cooper":"🐕 Cooper", "Parents":"👨‍👩‍👦 Mom & Dad",
-    "Aryan":"🧑 Aryan", "Hrithik":"🤜 Hrithik", "Manasa":"👱‍♀️ Manasa"
+    "Aryan":"🧑 Aryan", "Hrithik":"🤜 Hrithik", "Manasa":"👱‍♀️ Manasa",
+    "Ankur":"🧑 Ankur", "Shalin":"🧑 Shalin", "Dinesh":"🧑 Dinesh",
+    "Jhala":"🧑 Jhala", "Dad":"👨 Dad"
   };
 
   /* pretty URLs: trip name → slug (e.g. "The Big Loop" → the-big-loop) */
@@ -1163,8 +2003,15 @@
     return m;
   }
 
-  /* ---- search state: city / year / person ---- */
-  let fCity = "all", fYear = "all", fPerson = "all";
+  /* ---- search state: city / year / person / vehicle ---- */
+  let fCity = "all", fYear = "all", fPerson = "all", fVehicle = "all";
+
+  function pickVehicle(v, ev){
+    fVehicle = v;
+    document.querySelectorAll("#vehicleTabs .leg-tab").forEach(b=> b.classList.remove("active"));
+    ev.currentTarget.classList.add("active");
+    buildHome();
+  }
 
   const ALL_CITIES = [...new Set(
     Object.values(TRIPS).flatMap(t=> t.legs.flatMap(l=> l.cities.map(c=>c.name)))
@@ -1244,7 +2091,8 @@
         const m = TRIP_META[id];
         return (fYear==="all" || m.years.includes(Number(fYear)))
             && (fPerson==="all" || m.people.includes(fPerson))
-            && (fCity==="all" || tripHasCity(id, fCity));
+            && (fCity==="all" || tripHasCity(id, fCity))
+            && (fVehicle==="all" || m.vehicle===fVehicle);
       })
       .sort((a,b)=> TRIP_META[b].sort.localeCompare(TRIP_META[a].sort)); /* newest first */
     const totalKm = ids.reduce((a,id)=>a+TRIP_META[id].km, 0);
@@ -1263,6 +2111,7 @@
       card.innerHTML = `
         <div class="thumb"><div class="thumbmap"></div>
           <span class="badge">${t.where}</span>
+          <span class="badge" style="left:auto;right:12px">${t.vehicle==="bike" ? "🏍" : "🚗"}</span>
         </div>
         <div class="meta">
           <div class="gray">${t.when}</div>
@@ -1290,6 +2139,14 @@
       <circle cx="9" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
       <circle cx="24" cy="14" r="3.4" fill="#222" stroke="#fff" stroke-width="1.4"/>
       <circle cx="29" cy="7" r="1.6" fill="#fff8c4"/>
+    </g></svg>`;
+
+  const BIKE_HTML = `<svg width="46" height="30" viewBox="0 0 46 30">
+    <g transform="translate(7,6)">
+      <circle cx="7" cy="15" r="4.2" fill="none" stroke="#222" stroke-width="1.8"/>
+      <circle cx="25" cy="15" r="4.2" fill="none" stroke="#222" stroke-width="1.8"/>
+      <path d="M7,15 L15,7 L21,7 M15,7 L18,15 L25,15 M18,15 L13,15" fill="none" stroke="#E31C5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="19" y="4.5" width="6" height="2.6" rx="1" fill="#FF385C"/>
     </g></svg>`;
 
   function ensureMap(){
@@ -1434,13 +2291,15 @@
 
     /* park the car at the start */
     const start = segStates[0].pts[0];
+    const vehicleHtml = trip.vehicle === "bike" ? BIKE_HTML : CAR_HTML;
     if(!carMarker){
       carMarker = L.marker(start, {
         interactive:false, zIndexOffset:1000,
-        icon: L.divIcon({ className:"", html:`<div class="car-icon">${CAR_HTML}</div>`, iconSize:[46,30], iconAnchor:[23,15] })
+        icon: L.divIcon({ className:"", html:`<div class="car-icon">${vehicleHtml}</div>`, iconSize:[46,30], iconAnchor:[23,15] })
       }).addTo(map);
     } else {
       carMarker.setLatLng(start);
+      carMarker.setIcon(L.divIcon({ className:"", html:`<div class="car-icon">${vehicleHtml}</div>`, iconSize:[46,30], iconAnchor:[23,15] }));
     }
     carEl = carMarker.getElement().querySelector(".car-icon");
     carEl.style.transform = "";
